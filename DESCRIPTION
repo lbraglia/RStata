@@ -1,8 +1,9 @@
 Package: RStata
-Title: What the package does (short line)
+Title: Experiments with R-Stata integration
 Version: 0.1
-Authors@R: "First Last <first.last@example.com> [aut, cre]"
-Description: What the package does (paragraph)
-Depends: R (>= 3.1.1)
-License: What license is it under?
+Authors@R: "Luca Braglia <lbraglia@gmail.com> [aut, cre]"
+Description: Experiments with R-Stata integration
+Depends:
+    foreign
+License: GPL3
 LazyData: true
