@@ -5,5 +5,5 @@ Authors@R: "Luca Braglia <lbraglia@gmail.com> [aut, cre]"
 Description: Experiments with R-Stata integration
 Depends:
     foreign
-License: GPL3
+License: GPL-3
 LazyData: true
