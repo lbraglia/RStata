@@ -3,7 +3,7 @@ Title: Experiments with R-Stata integration
 Version: 0.1
 Authors@R: "Luca Braglia <lbraglia@gmail.com> [aut, cre]"
 Description: Experiments with R-Stata integration
-Depends:
+Imports:
     foreign,
     tools
 License: GPL-3
