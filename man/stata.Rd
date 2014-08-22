@@ -3,23 +3,49 @@
 \alias{stata}
 \title{Send commands to a Stata process}
 \usage{
-stata(x)
+stata(src = stop("At least 'src' must be specified"), data.in = NULL,
+  data.out = FALSE, stata.path = getOption("RStata.StataPath",
+  Sys.which("stata-se")), stata.echo = getOption("RStata.StataEcho", TRUE),
+  ...)
 }
 \arguments{
-\item{x}{character vector of length 1 (path to \code{.do} file) or more
+\item{src}{character vector of length 1 (path to \code{.do} file) or more
 (a set of stata commands). See examples.}
+
+\item{data.in}{\code{\link{data.frame}} to be passed to Stata}
+
+\item{data.out}{logical value. If \code{TRUE}, the data at the end of
+the Stata command are returned to R.}
+
+\item{stata.path}{Stata command to be used}
+
+\item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
+
+\item{...}{parameter passed to \code{\link{write.dta}}}
 }
 \description{
-Simple functions to send commands to a Stata process
+Functions to send commands to a Stata process. DESCRIBE MORE: todo
 }
 \examples{
+\dontrun{
 ## Single command
 stata("help regress")
 ## Many commands
-do <- c( "set obs 200",
-         "gen a = 1"   )
-stata(do)
+stata(c( "set obs 200", "gen a = 1" ))
 ## External file
 stata("foo.do")
+
+## Data input to Stata
+x <- data.frame(a = rnorm(3), b = letters[1:3])
+stata( c('sum a'), data.in = x)
+
+## Data output from Stata
+x <- stata(c("set obs 200", "gen a = 1"), data.out = TRUE)
+head(x)
+
+## Data input/output
+y <- stata("replace a = 2", data.in = x, data.out = TRUE)
+y
+}
 }
 
