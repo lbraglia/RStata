@@ -5,7 +5,8 @@
 \usage{
 stata(src = stop("At least 'src' must be specified"), data.in = NULL,
   data.out = FALSE, stata.path = getOption("RStata.StataPath",
-  Sys.which("stata-se")), stata.echo = getOption("RStata.StataEcho", TRUE),
+  stop("You need to set up a Stata path; ?chooseStataBin")),
+  stata.echo = getOption("RStata.StataEcho", TRUE),
   stata.quiet = getOption("RStata.StataQuiet", TRUE), ...)
 }
 \arguments{
