@@ -8,6 +8,8 @@
 #' the Stata command are returned to R.
 #' @param stata.path Stata command to be used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param stata.quiet logical value. If \code{TRUE} startup message will
+#' not be printed
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -36,6 +38,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   data.out = FALSE,
                   stata.path = getOption("RStata.StataPath", Sys.which("stata-se")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
+                  stata.quiet = getOption("RStata.StataQuiet", TRUE),
                   ## stata.version = getOption("RStata.StataVersion", getStataVersion()),
                   ...
                   )
@@ -49,11 +52,24 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## Connections
   ## -----------
   ## con: R -> Stata command interface
-  ## fifoFile <- "RStata.fifo"
   fifoFile <- tempfile("RStataFifo", fileext = ".do")
   con <- fifo(fifoFile, "w+")
+
+  ## Stata invocation parameters handling
+  quietPar <- if (!stata.quiet) {
+    ""
+  } else {
+    if (Sys.info()["sysname"]=="Linux"){
+      "-q"
+    } else if (Sys.info()["sysname"]=="Windows") {
+      "/q"
+    } else {
+      ""
+    }
+  }
+  
   ## rdl: Stata -> R output retrieval
-  rdl <- pipe(paste(stata.path, "do", fifoFile))
+  rdl <- pipe(paste(stata.path, quietPar , "do", fifoFile))
 
   ## stata.version should be evaluated below for safety??
   ## vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv

@@ -6,7 +6,7 @@
 stata(src = stop("At least 'src' must be specified"), data.in = NULL,
   data.out = FALSE, stata.path = getOption("RStata.StataPath",
   Sys.which("stata-se")), stata.echo = getOption("RStata.StataEcho", TRUE),
-  ...)
+  stata.quiet = getOption("RStata.StataQuiet", TRUE), ...)
 }
 \arguments{
 \item{src}{character vector of length 1 (path to \code{.do} file) or more
@@ -20,6 +20,9 @@ the Stata command are returned to R.}
 \item{stata.path}{Stata command to be used}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
+
+\item{stata.quiet}{logical value. If \code{TRUE} startup message will
+not be printed}
 
 \item{...}{parameter passed to \code{\link{write.dta}}}
 }
