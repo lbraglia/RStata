@@ -81,13 +81,13 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
   if (dataIn){
     dtainFile <- tempfile("RStataDataIn", fileext = ".dta")
-    on.exit(unlink(doFile), add = TRUE)
+    on.exit(unlink(dtainFile), add = TRUE)
     write.dta(data.in, file = dtainFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
   }  
 
   if (dataOut) {
     dtaoutFile <- tempfile("RStataDataOut", fileext = ".dta")
-    on.exit(unlink(dtainFile), add = TRUE)
+    on.exit(unlink(dtaoutFile), add = TRUE)
   }
 
   ## -------------------------
@@ -148,8 +148,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## IPC
   ## ---
   ## setup the .do file
-  con <- pipe(doFile, "w")
+  con <- fifo(doFile)
   on.exit(close(con), add = TRUE)
+  open(con, "w+")
   writeLines(src, con)
 
   ## execute Stata
