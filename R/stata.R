@@ -55,7 +55,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
   ## Move to a temp directory: on some OS (Windows) /e (batch mode with
   ## ASCII log and no prompting without exiting from Stata) is needed. This
-  ## keep directory clean
+  ## keeps directory clean
   oldpwd <- getwd()
   on.exit(setwd(oldpwd))
 
@@ -80,7 +80,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
   
   ## rdl: Stata -> R output retrieval.
   ## With Windows version, /e is almost always needed (Stata GUI install)
-  rdl <- pipe(paste(stata.path, ifelse(OS %in% "Windows", "/e", ""), quietPar , "do", fifoFile))
+  stataCmd <- paste(stata.path,
+                    ifelse(OS %in% "Windows", "/e", ""),
+                    quietPar ,
+                    "do",
+                    fifoFile)
+  rdl <- pipe(stataCmd)
   
   ## data.in 'connection'
   if (is.data.frame(data.in)){
