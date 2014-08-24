@@ -83,14 +83,14 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
   if (dataIn){
     ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta") # Windows/Stata8 unhappy?
-    dtaInFile <- "RStataDataIn.dta")
+    dtaInFile <- "RStataDataIn.dta"
     on.exit(unlink(dtaInFile), add = TRUE)
     write.dta(data.in, file = dtaInFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
   }  
 
   if (dataOut) {
     ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta") # Windows/Stata8 unhappy?
-    dtaOutFile <- "RStataDataOut"
+    dtaOutFile <- "RStataDataOut.dta"
     on.exit(unlink(dtaOutFile), add = TRUE)
   }
 
