@@ -44,6 +44,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   ...
                   )
 {
+
+  OS <- Sys.info()["sysname"]
+  OS.type <- .Platform$OS.type
   
   ## External .do script 'support': KIS
   ## ----------------------------------
@@ -60,9 +63,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
   quietPar <- if (!stata.quiet) {
     ""
   } else {
-    if (Sys.info()["sysname"]=="Linux"){
+    if (OS=="Linux"){
       "-q"
-    } else if (Sys.info()["sysname"]=="Windows") {
+    } else if (OS=="Windows") {
       "/q"
     } else {
       ""

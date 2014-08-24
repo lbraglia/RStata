@@ -8,7 +8,8 @@
 chooseStataBin <- function()
 {
   OS <- Sys.info()["sysname"]
-    
+  OS.type <- .Platform$OS.type
+  
     ## ------------------------------
   if (OS %in% "Linux") {
     m <- c(`Stata MP` = "stata-mp",
