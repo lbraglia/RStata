@@ -53,38 +53,45 @@ stata <- function(src = stop("At least 'src' must be specified"),
   if (length(src)==1 && file.exists(src))
     src <- readLines(src)
 
+  ## Move to a temp directory: on some OS (Windows) /e (batch mode with
+  ## ASCII log and no prompting without exiting from Stata) is needed. This
+  ## keep directory clean
+  oldpwd <- getwd()
+  on.exit(setwd(oldpwd))
+
   ## Connections
   ## -----------
   ## con: R -> Stata command interface
-  fifoFile <- tempfile("RStataFifo", fileext = ".do")
+  fifoFile <- tempfile("RStata", fileext = ".do")
   con <- fifo(fifoFile, "w+")
 
   ## Stata invocation parameters handling
   quietPar <- if (!stata.quiet) {
     ""
   } else {
-    if (OS=="Linux"){
+    if (OS %in% "Linux"){
       "-q"
-    } else if (OS=="Windows") {
+    } else if (OS %in% "Windows") {
       "/q"
     } else {
       ""
     }
   }
   
-  ## rdl: Stata -> R output retrieval
-  rdl <- pipe(paste(stata.path, quietPar , "do", fifoFile))
+  ## rdl: Stata -> R output retrieval.
+  ## With Windows version, /e is almost always needed (Stata GUI install)
+  rdl <- pipe(paste(stata.path, ifelse(OS %in% "Windows", "/e", ""), quietPar , "do", fifoFile))
   
   ## data.in 'connection'
   if (is.data.frame(data.in)){
-    dtainFile <- tempfile("RStataIn", fileext = ".dta")
+    dtainFile <- tempfile("RStataDataIn", fileext = ".dta")
     write.dta(data.in, file = dtainFile, version = ifelse(stata.version >= 7, 7L, 6L), ...)
     src <- c(sprintf("use %s",  file_path_sans_ext(dtainFile)), src)
   }
 
   ## src management dued to data.out
   if (data.out) {
-    dtaoutFile <- tempfile("RStataOut", fileext = ".dta")
+    dtaoutFile <- tempfile("RStataDataOut", fileext = ".dta")
     src <- c(src, sprintf("%s %s",
                           ifelse(stata.version >= 13, "saveold", "save"),
                           file_path_sans_ext(dtaoutFile) ))
