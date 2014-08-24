@@ -1,6 +1,6 @@
 #' Send commands to a Stata process
 #'
-#' Functions to send commands to a Stata process. DESCRIBE MORE: todo
+#' Function that send commands to a Stata process.
 #' @param src character vector of length 1 (path to \code{.do} file) or more
 #' (a set of stata commands). See examples.
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
@@ -44,29 +44,75 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   ...
                   )
 {
+  ## -------------------------
+  ## Data validation and setup
+  ## -------------------------
+  if (!is.character(src))
+    stop("src must be a character")
+  
+  if (!(is.null(data.in) | is.data.frame(data.in)))
+    stop("data.in must be NULL or a data.frame")
+  
+  if (!is.logical(data.out))
+    stop("data.out must be logical")
 
+  if (!is.numeric(stata.version))
+    stop("stata.version must be logical")
+
+  if (!is.logical(stata.echo))
+    stop("stata.echo must be logical")
+
+  if (!is.logical(stata.quiet))
+    stop("stata.quiet must be logical")
+  
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
+  dataIn <- is.data.frame(data.in)
+  dataOut <- data.out[1L]
+  stataVersion <- stata.version[1L]
+  stataEcho <- stata.echo[1L]
+  stataQuiet <- stata.quiet[1L]
   
+  ## -----
+  ## Files
+  ## -----
+  doFile <- tempfile("RStata", fileext = ".do")
+  on.exit(unlink(doFile))
+
+  if (dataIn){
+    dtainFile <- tempfile("RStataDataIn", fileext = ".dta")
+    on.exit(unlink(doFile), add = TRUE)
+    write.dta(data.in, file = dtainFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
+  }  
+
+  if (dataOut) {
+    dtaoutFile <- tempfile("RStataDataOut", fileext = ".dta")
+    on.exit(unlink(dtainFile), add = TRUE)
+  }
+
+  ## -------------------------
+  ## Creating the .do file ...
+  ## -------------------------
   ## External .do script 'support': KIS
-  ## ----------------------------------
-  if (length(src)==1 && file.exists(src))
-    src <- readLines(src)
+  if (file.exists(src[1L]))
+    src <- readLines(src[1L])
 
-  ## Move to a temp directory: on some OS (Windows) /e (batch mode with
-  ## ASCII log and no prompting without exiting from Stata) is needed. This
-  ## keeps directory clean
-  oldpwd <- getwd()
-  on.exit(setwd(oldpwd))
+  ## put a use at the top of .do if a data.frame is passed to data.in
+  if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtainFile)), src)
 
-  ## Connections
-  ## -----------
-  ## con: R -> Stata command interface
-  fifoFile <- tempfile("RStata", fileext = ".do")
-  con <- fifo(fifoFile, "w+")
+  ## put a save or saveold at the end of .do if data.out == TRUE
+  if (dataOut)  src <- c(src, sprintf("%s %s",
+                                      ifelse(stataVersion >= 13, "saveold", "save"),
+                                      file_path_sans_ext(dtaoutFile) ))
+    
+  ## adding this command to the end simplify life if user make changes but
+  ## doesn't want a data.frame back
+  src <- c(src, "exit, clear STATA")
 
-  ## Stata invocation parameters handling
-  quietPar <- if (!stata.quiet) {
+  ## -------------
+  ## Stata command
+  ## -------------
+  quietPar <- if (!stataQuiet) {
     ""
   } else {
     if (OS %in% "Linux"){
@@ -77,52 +123,46 @@ stata <- function(src = stop("At least 'src' must be specified"),
       ""
     }
   }
-  
-  ## rdl: Stata -> R output retrieval.
-  ## With Windows version, /e is almost always needed (Stata GUI install)
+
+  ## With Windows version, /e is almost always needed (if Stata is
+  ## installed with GUI)
   stataCmd <- paste(stata.path,
                     ifelse(OS %in% "Windows", "/e", ""),
                     quietPar ,
                     "do",
-                    fifoFile)
-  rdl <- pipe(stataCmd)
-  
-  ## data.in 'connection'
-  if (is.data.frame(data.in)){
-    dtainFile <- tempfile("RStataDataIn", fileext = ".dta")
-    write.dta(data.in, file = dtainFile, version = ifelse(stata.version >= 7, 7L, 6L), ...)
-    src <- c(sprintf("use %s",  file_path_sans_ext(dtainFile)), src)
-  }
+                    doFile)
 
-  ## src management dued to data.out
-  if (data.out) {
-    dtaoutFile <- tempfile("RStataDataOut", fileext = ".dta")
-    src <- c(src, sprintf("%s %s",
-                          ifelse(stata.version >= 13, "saveold", "save"),
-                          file_path_sans_ext(dtaoutFile) ))
-  }
-    
-  ## adding this command to the end simplify life if user make changes but
-  ## doesn't want a data.frame back
-  src <- c(src, "exit, clear STATA")
+
+  ## ----------------
+  ## Directory change
+  ## ----------------
+  ## Move to a temp directory: on some OS (Windows) /e (batch mode with
+  ## ASCII log and no prompting without exiting from Stata) is needed. This
+  ## keeps directory clean
+  ## ... but a nested call of do file could break if relative paths are used
   
-  ## write to and read from Stata
+  ## oldpwd <- getwd()
+  ## on.exit(setwd(oldpwd), add = TRUE)
+  
+  ## ---
+  ## IPC
+  ## ---
+  ## setup the .do file
+  con <- pipe(doFile, "w")
+  on.exit(close(con), add = TRUE)
   writeLines(src, con)
+
+  ## execute Stata
+  rdl <- pipe(stataCmd, "r")
+  on.exit(close(rdl), add = TRUE)
   stataLog <- readLines(rdl)
-  if (stata.echo) cat(stataLog, sep = "\n")
-
-  ## Required connection management
-  close(con)
-  close(rdl)
-  unlink(fifoFile)
-
-  ## cleaning file passed to Stata
-  if (is.data.frame(data.in)) unlink(dtainFile)
+  if (stataEcho) cat(stataLog, sep = "\n")
   
-  ## get data
-  if (data.out){
+  ## ------------------
+  ## Get data outputted
+  ## ------------------
+  if (dataOut){
     res <- read.dta(dtaoutFile, ...)
-    unlink(dtaoutFile)
     invisible(res)
   }
   
