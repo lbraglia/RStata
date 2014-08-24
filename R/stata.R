@@ -76,18 +76,20 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## -----
   ## Files
   ## -----
-  doFile <- tempfile("RStata", fileext = ".do")
+  ## doFile <- tempfile("RStata", fileext = ".do")
+  ## tempfile could be misleading if the do source other dos with relative paths
+  doFile <- "RStata.do"
   on.exit(unlink(doFile))
 
   if (dataIn){
-    dtainFile <- tempfile("RStataDataIn", fileext = ".dta")
-    on.exit(unlink(dtainFile), add = TRUE)
-    write.dta(data.in, file = dtainFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
+    dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
+    on.exit(unlink(dtaInFile), add = TRUE)
+    write.dta(data.in, file = dtaInFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
   }  
 
   if (dataOut) {
-    dtaoutFile <- tempfile("RStataDataOut", fileext = ".dta")
-    on.exit(unlink(dtaoutFile), add = TRUE)
+    dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
+    on.exit(unlink(dtaOutFile), add = TRUE)
   }
 
   ## -------------------------
@@ -98,12 +100,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
     src <- readLines(src[1L])
 
   ## put a use at the top of .do if a data.frame is passed to data.in
-  if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtainFile)), src)
+  if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), src)
 
   ## put a save or saveold at the end of .do if data.out == TRUE
   if (dataOut)  src <- c(src, sprintf("%s %s",
                                       ifelse(stataVersion >= 13, "saveold", "save"),
-                                      file_path_sans_ext(dtaoutFile) ))
+                                      file_path_sans_ext(dtaOutFile) ))
     
   ## adding this command to the end simplify life if user make changes but
   ## doesn't want a data.frame back
@@ -165,7 +167,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## Get data outputted
   ## ------------------
   if (dataOut){
-    res <- read.dta(dtaoutFile, ...)
+    res <- read.dta(dtaOutFile, ...)
     invisible(res)
   }
   
