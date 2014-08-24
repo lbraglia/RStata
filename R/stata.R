@@ -148,9 +148,11 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## IPC
   ## ---
   ## setup the .do file
-  con <- fifo(doFile)
+  ## con <- fifo(doFile)
+  con <- file(doFile)
   on.exit(close(con), add = TRUE)
-  open(con, "w+")
+  ## open(con, "w+")  # <- freeze with fifo in Window
+  open(con, "w")
   writeLines(src, con)
 
   ## execute Stata
