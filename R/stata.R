@@ -152,17 +152,16 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## IPC
   ## ---
   ## setup the .do file
-  ## con <- fifo(doFile)
-  con <- file(doFile)
-  on.exit(close(con), add = TRUE)
-  ## open(con, "w+")  # <- freeze with fifo in Window
-  open(con, "w")
+  ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
+  con <- file(doFile, "w")
   writeLines(src, con)
-
+  close(con)
+  
   ## execute Stata
   rdl <- pipe(stataCmd, "r")
-  on.exit(close(rdl), add = TRUE)
   stataLog <- readLines(rdl)
+  close(rdl)
+
   if (stataEcho) cat(stataLog, sep = "\n")
   
   ## ------------------
