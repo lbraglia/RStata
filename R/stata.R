@@ -7,6 +7,7 @@
 #' @param data.out logical value. If \code{TRUE}, the data at the end of
 #' the Stata command are returned to R.
 #' @param stata.path Stata command to be used
+#' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
 #' @param stata.quiet logical value. If \code{TRUE} startup message will
 #' not be printed
@@ -37,9 +38,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   data.in = NULL,
                   data.out = FALSE,
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
+                  stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
                   stata.quiet = getOption("RStata.StataQuiet", TRUE),
-                  ## stata.version = getOption("RStata.StataVersion", getStataVersion()),
                   ...
                   )
 {
@@ -70,21 +71,20 @@ stata <- function(src = stop("At least 'src' must be specified"),
   
   ## rdl: Stata -> R output retrieval
   rdl <- pipe(paste(stata.path, quietPar , "do", fifoFile))
-
-  ## stata.version should be evaluated below for safety??
-  ## vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
   
   ## data.in 'connection'
   if (is.data.frame(data.in)){
     dtainFile <- tempfile("RStataIn", fileext = ".dta")
-    write.dta(data.in, file = dtainFile, ...)
+    write.dta(data.in, file = dtainFile, version = ifelse(stata.version >= 7, 7L, 6L), ...)
     src <- c(sprintf("use %s",  file_path_sans_ext(dtainFile)), src)
   }
 
   ## src management dued to data.out
   if (data.out) {
     dtaoutFile <- tempfile("RStataOut", fileext = ".dta")
-    src <- c(src, sprintf("saveold %s", file_path_sans_ext(dtaoutFile) ))
+    src <- c(src, sprintf("%s %s",
+                          ifelse(stata.version >= 13, "saveold", "save"),
+                          file_path_sans_ext(dtaoutFile) ))
   }
     
   ## adding this command to the end simplify life if user make changes but

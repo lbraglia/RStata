@@ -6,6 +6,8 @@
 stata(src = stop("At least 'src' must be specified"), data.in = NULL,
   data.out = FALSE, stata.path = getOption("RStata.StataPath",
   stop("You need to set up a Stata path; ?chooseStataBin")),
+  stata.version = getOption("RStata.StataVersion",
+  stop("You need to specify your Stata version")),
   stata.echo = getOption("RStata.StataEcho", TRUE),
   stata.quiet = getOption("RStata.StataQuiet", TRUE), ...)
 }
@@ -19,6 +21,8 @@ stata(src = stop("At least 'src' must be specified"), data.in = NULL,
 the Stata command are returned to R.}
 
 \item{stata.path}{Stata command to be used}
+
+\item{stata.version}{Version of Stata used}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
 
