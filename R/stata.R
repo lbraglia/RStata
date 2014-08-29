@@ -30,8 +30,7 @@
 #' head(auto)
 #'
 #' ## Data input/output
-#' y <- stata("replace a = 2", data.in = x, data.out = TRUE)
-#' y
+#' (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 #' }
 #' @export
 stata <- function(src = stop("At least 'src' must be specified"),

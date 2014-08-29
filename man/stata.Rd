@@ -52,8 +52,7 @@ auto <- stata("sysuse auto", data.out = TRUE)
 head(auto)
 
 ## Data input/output
-y <- stata("replace a = 2", data.in = x, data.out = TRUE)
-y
+(y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 }
 }
 
