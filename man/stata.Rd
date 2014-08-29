@@ -32,7 +32,7 @@ not be printed}
 \item{...}{parameter passed to \code{\link{write.dta}}}
 }
 \description{
-Functions to send commands to a Stata process. DESCRIBE MORE: todo
+Function that send commands to a Stata process.
 }
 \examples{
 \dontrun{
@@ -45,11 +45,11 @@ stata("foo.do")
 
 ## Data input to Stata
 x <- data.frame(a = rnorm(3), b = letters[1:3])
-stata( c('sum a'), data.in = x)
+stata( "sum a", data.in = x)
 
-## Data output from Stata
-x <- stata(c("set obs 200", "gen a = 1"), data.out = TRUE)
-head(x)
+## Data output from Stata (eg obtain 'auto' dataset)
+auto <- stata("sysuse auto"), data.out = TRUE)
+head(auto)
 
 ## Data input/output
 y <- stata("replace a = 2", data.in = x, data.out = TRUE)

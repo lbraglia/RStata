@@ -23,11 +23,11 @@
 #'
 #' ## Data input to Stata
 #' x <- data.frame(a = rnorm(3), b = letters[1:3])
-#' stata( c('sum a'), data.in = x)
+#' stata( "sum a", data.in = x)
 #'
-#' ## Data output from Stata
-#' x <- stata(c("set obs 200", "gen a = 1"), data.out = TRUE)
-#' head(x)
+#' ## Data output from Stata (eg obtain 'auto' dataset)
+#' auto <- stata("sysuse auto"), data.out = TRUE)
+#' head(auto)
 #'
 #' ## Data input/output
 #' y <- stata("replace a = 2", data.in = x, data.out = TRUE)
