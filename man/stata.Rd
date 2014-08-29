@@ -32,15 +32,15 @@ not be printed}
 \item{...}{parameter passed to \code{\link{write.dta}}}
 }
 \description{
-Function that send commands to a Stata process.
+Function that sends commands to a Stata process.
 }
 \examples{
 \dontrun{
 ## Single command
-stata("help regress")
+stata("help regress") #<- this won't work in Windows dued to needed batch mode
 ## Many commands
 stata(c( "set obs 200", "gen a = 1" ))
-## External file
+## External .do file
 stata("foo.do")
 
 ## Data input to Stata
@@ -48,7 +48,7 @@ x <- data.frame(a = rnorm(3), b = letters[1:3])
 stata( "sum a", data.in = x)
 
 ## Data output from Stata (eg obtain 'auto' dataset)
-auto <- stata("sysuse auto"), data.out = TRUE)
+auto <- stata("sysuse auto", data.out = TRUE)
 head(auto)
 
 ## Data input/output

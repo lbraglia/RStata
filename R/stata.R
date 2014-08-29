@@ -1,6 +1,6 @@
 #' Send commands to a Stata process
 #'
-#' Function that send commands to a Stata process.
+#' Function that sends commands to a Stata process.
 #' @param src character vector of length 1 (path to \code{.do} file) or more
 #' (a set of stata commands). See examples.
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
@@ -15,10 +15,10 @@
 #' @examples
 #' \dontrun{
 #' ## Single command
-#' stata("help regress")
+#' stata("help regress") #<- this won't work in Windows dued to needed batch mode
 #' ## Many commands
 #' stata(c( "set obs 200", "gen a = 1" ))
-#' ## External file
+#' ## External .do file
 #' stata("foo.do")
 #'
 #' ## Data input to Stata
@@ -26,7 +26,7 @@
 #' stata( "sum a", data.in = x)
 #'
 #' ## Data output from Stata (eg obtain 'auto' dataset)
-#' auto <- stata("sysuse auto"), data.out = TRUE)
+#' auto <- stata("sysuse auto", data.out = TRUE)
 #' head(auto)
 #'
 #' ## Data input/output
@@ -76,7 +76,8 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## -----------------
   ## OS related config
   ## -----------------
-  ## in Windows and batch mode a RStata.log is generated in the current directory
+  ## in Windows and batch mode a RStata.log (naming after RStata.do below)
+  ## is generated in the current directory 
   if (OS %in% "Windows") {
     winRStataLog <- "RStata.log"
     on.exit(unlink(winRStataLog))
@@ -172,7 +173,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   close(rdl)
 
   if (stataEcho) {
-    if (OS %in% "Windows") stataLog <- readLines("RStata.log")
+    if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
     cat(stataLog, sep = "\n")
   }
   ## ------------------
