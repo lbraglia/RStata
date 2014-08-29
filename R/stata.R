@@ -95,7 +95,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta") # Windows/Stata8 unhappy?
     dtaInFile <- "RStataDataIn.dta"
     on.exit(unlink(dtaInFile), add = TRUE)
-    write.dta(data.in, file = dtaInFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
+    foreign::write.dta(data.in, file = dtaInFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
   }  
 
   if (dataOut) {
@@ -180,7 +180,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## Get data outputted
   ## ------------------
   if (dataOut){
-    res <- read.dta(dtaOutFile, ...)
+    res <- foreign::read.dta(dtaOutFile, ...)
     invisible(res)
   }
   
