@@ -72,6 +72,15 @@ stata <- function(src = stop("At least 'src' must be specified"),
   stataVersion <- stata.version[1L]
   stataEcho <- stata.echo[1L]
   stataQuiet <- stata.quiet[1L]
+
+  ## -----------------
+  ## OS related config
+  ## -----------------
+  ## in Windows and batch mode a RStata.log is generated in the current directory
+  if (OS %in% "Windows") {
+    winRStataLog <- "RStata.log"
+    on.exit(unlink(winRStataLog))
+  }
   
   ## -----
   ## Files
@@ -79,7 +88,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## doFile <- tempfile("RStata", fileext = ".do")
   ## tempfile could be misleading if the do source other dos with relative paths
   doFile <- "RStata.do"
-  on.exit(unlink(doFile))
+  on.exit(unlink(doFile), add = TRUE)
 
   if (dataIn){
     ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta") # Windows/Stata8 unhappy?
@@ -162,8 +171,10 @@ stata <- function(src = stop("At least 'src' must be specified"),
   stataLog <- readLines(rdl)
   close(rdl)
 
-  if (stataEcho) cat(stataLog, sep = "\n")
-  
+  if (stataEcho) {
+    if (OS %in% "Windows") stataLog <- readLines("RStata.log")
+    cat(stataLog, sep = "\n")
+  }
   ## ------------------
   ## Get data outputted
   ## ------------------
