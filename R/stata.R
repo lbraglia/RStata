@@ -114,9 +114,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
   if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), src)
 
   ## put a save or saveold at the end of .do if data.out == TRUE
-  if (dataOut)  src <- c(src, sprintf("%s %s",
+  ## for Stata 14, saveold defaults to a Stata 13 dta file
+  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow foreign::read.dta() read compatibility
+  if (dataOut)  src <- c(src, sprintf("%s %s%s",
                                       ifelse(stataVersion >= 13, "saveold", "save"),
-                                      file_path_sans_ext(dtaOutFile) ))
+                                      file_path_sans_ext(dtaOutFile),
+                                      ifelse(stataVersion >= 14, ", version(12)", "") ))
     
   ## adding this command to the end simplify life if user make changes but
   ## doesn't want a data.frame back
