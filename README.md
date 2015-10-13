@@ -18,31 +18,37 @@ Otherwise, [here](https://ci.appveyor.com/project/lbraglia/rstata/build/artifact
 
 
 ## Setup
-The main function in the package is `stata`. You need at least to tell R the
-Stata path (and probably the Stata version for data interchange), in order
-to use this package: to do this you have to setup two `options`
+In order to use this package you need to setup two `options`:
 ```
 options("RStata.StataPath")
 options("RStata.StataVersion")
 ```
+Once done, the main function in the package is `stata` (see Examples below).
+
 
 ### RStata.StataPath
-`RStata.StataPath` contains is the path to the Stata executable (Windows
-user have to delete the extension `.exe` from the path ), the latter a
-numeric indicating the Stata version of the executable.
+`RStata.StataPath` contains the path to Stata executable (Windows
+user have to delete the extension `.exe` from the path ). Using
 
-`chooseStataBin` can help for the first. In Linux it searches for the 4
-(cli) Stata binaries (`stata-mp`, `stata-se`, `stata`, `stata-sm`) in the
-search path and prompt a menu to choose one; in Windows do a `file.choose`
-and a bit of manipulation to obtain a valid Windows path (no `.exe`
-extension).  `chooseStataBin` set up `RStata.StataPath` accordingly to user
-advice and return the path; but you may consider to put the path returned
-in `.Rprofile` `options` for the next time you start R.
+```
+chooseStataBin()
+```
+
+to set this option the first time is rather handy. The function:
+- in Linux it searches for the 4 (cli) Stata binaries (`stata-mp`,
+  `stata-se`, `stata`, `stata-sm`) in the search path and prompt a menu to
+  choose one;
+- in Windows does a `file.choose` and a bit of manipulation to obtain a valid
+  Windows path (no `.exe` extension).
+
+`chooseStataBin` set up `RStata.StataPath` accordingly to user advice and
+return the path; but you may consider to put the path returned in
+`.Rprofile` `options` for the next time you start R.
 
 ### RStata.StataVersion
 `RStata.StataVersion` is needed for right management of data export/import
 to/from Stata (only if you use `data.in` or `data.out` parameters in `stata`
-function call). Eg, for the latest Stata version:
+function call). Eg, for Stata 13:
 ```
 options("RStata.StataVersion" = 13)
 ```
