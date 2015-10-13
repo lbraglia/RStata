@@ -28,13 +28,15 @@ Once done, the main function in the package is `stata` (see Examples below).
 
 ### RStata.StataPath
 `RStata.StataPath` contains the path to Stata executable (Windows
-user have to delete the extension `.exe` from the path ). Using
+user have to delete the extension `.exe` from the path ).
+
+You can use
 
 ```
 chooseStataBin()
 ```
 
-to set this option the first time is rather handy. The function:
+to set this option the first time:
 - in Linux it searches for the 4 (cli) Stata binaries (`stata-mp`,
   `stata-se`, `stata`, `stata-sm`) in the search path and prompt a menu to
   choose one;
@@ -43,15 +45,15 @@ to set this option the first time is rather handy. The function:
 
 `chooseStataBin` set up `RStata.StataPath` accordingly to user advice and
 return the path; but you may consider to put the path returned in
-`.Rprofile` `options` for the next time you start R.
+`.Rprofile` options for the next time you start R.
 
 ### RStata.StataVersion
 `RStata.StataVersion` is needed for right management of data export/import
-to/from Stata (only if you use `data.in` or `data.out` parameters in `stata`
-function call). Eg, for Stata 13:
+to/from Stata.  Eg, for Stata 13:
 ```
 options("RStata.StataVersion" = 13)
 ```
+
 As above, you may consider to put this statement in your `.Rprofile`.
 
 ### Other options
