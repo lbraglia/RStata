@@ -113,6 +113,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## put a use at the top of .do if a data.frame is passed to data.in
   if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), src)
 
+  ## set more off just to be sure nothing will freeze (hopefully :) )
+  src <- c('set more off', src)
+             
   ## put a save or saveold at the end of .do if data.out == TRUE
   ## for Stata 14, saveold defaults to a Stata 13 dta file
   ## -> use the (Stata 14 only) saveold option: "version(12)" to allow foreign::read.dta() read compatibility
