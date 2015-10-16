@@ -4,6 +4,10 @@ RStata 0.2.2
 NEW FEATURES
 * Added read/write compatibility for Stata 14 (#3). Thanks to tystan
 
+BUG FIXES
+* set more off by default at the beginning of the script, in order to avoid
+  unneeded freezings (eg when looking documentation)
+
 
 RStata 0.2.1
 ----------------------------------------------------------------
