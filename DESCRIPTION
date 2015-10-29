@@ -1,6 +1,6 @@
 Package: RStata
 Title: Experiments with R-Stata integration
-Version: 0.3.0
+Version: 0.4.0
 Authors@R: person("Luca", "Braglia", email = "lbraglia@gmail.com", role = c("aut", "cre"))
 Description: Experiments with R-Stata integration.
 Imports:

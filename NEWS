@@ -1,3 +1,23 @@
+RStata 0.4.0
+----------------------------------------------------------------
+
+NEW FEATURES
+* Now it is possibile to code multiple statements in a more natural way
+  (due to a bit of strsplit), eg
+
+  ```
+  stata_src <- '
+
+  version 10
+  set more off
+  sysuse auto
+  reg mpg weight
+
+  '
+  stata(stata_src)
+  ```    
+
+
 RStata 0.3.0
 ----------------------------------------------------------------
 
