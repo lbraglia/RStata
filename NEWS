@@ -1,3 +1,12 @@
+RStata 0.3.0
+----------------------------------------------------------------
+
+BUG FIXES
+* capture noisily by default in order to avoid unneeded freezings (eg when
+  making mistakes with stata syntax). Can be deactivated, if needed,
+  setting capture = FALSE in stata function.
+  
+
 RStata 0.2.2
 ----------------------------------------------------------------
 
