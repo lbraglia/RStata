@@ -67,14 +67,19 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
   if (!is.logical(stata.quiet))
     stop("stata.quiet must be logical")
-  
+
+  if (!is.logical(capture))
+    stop("capture must be logical")
+
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
+  SRC <- unlist(lapply(src, strsplit, '\n'))
   dataIn <- is.data.frame(data.in)
   dataOut <- data.out[1L]
   stataVersion <- stata.version[1L]
   stataEcho <- stata.echo[1L]
   stataQuiet <- stata.quiet[1L]
+  Capture <- capture[1L]
 
   ## -----------------
   ## OS related config
@@ -111,30 +116,30 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## Creating the .do file ...
   ## -------------------------
   ## External .do script 'support': KIS
-  if (file.exists(src[1L]))
-    src <- readLines(src[1L])
+  if (file.exists(SRC[1L]))
+    SRC <- readLines(SRC[1L])
 
   ## put a use at the top of .do if a data.frame is passed to data.in
-  if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), src)
+  if (dataIn)  SRC <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), SRC)
 
   ## capture noisily
-  if (capture)
-    src <- c('capture noisily {', '', src, '', '} /* end capture noisily */')
+  if (Capture)
+    SRC <- c('capture noisily {', '', SRC, '', '} /* end capture noisily */')
 
   ## set more off just to be sure nothing will freeze (hopefully :) )
-  src <- c('set more off', src)
+  SRC <- c('set more off', SRC)
     
   ## put a save or saveold at the end of .do if data.out == TRUE
   ## for Stata 14, saveold defaults to a Stata 13 dta file
   ## -> use the (Stata 14 only) saveold option: "version(12)" to allow foreign::read.dta() read compatibility
-  if (dataOut)  src <- c(src, sprintf("%s %s%s",
+  if (dataOut)  SRC <- c(SRC, sprintf("%s %s%s",
                                       ifelse(stataVersion >= 13, "saveold", "save"),
                                       file_path_sans_ext(dtaOutFile),
                                       ifelse(stataVersion >= 14, ", version(12)", "") ))
     
   ## adding this command to the end simplify life if user make changes but
   ## doesn't want a data.frame back
-  src <- c(src, "exit, clear STATA")
+  SRC <- c(SRC, "exit, clear STATA")
 
   ## -------------
   ## Stata command
@@ -177,7 +182,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## setup the .do file
   ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
   con <- file(doFile, "w")
-  writeLines(src, con)
+  writeLines(SRC, con)
   close(con)
   
   ## execute Stata
