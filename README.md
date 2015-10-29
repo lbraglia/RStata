@@ -63,7 +63,8 @@ See `?stata`.
 
 ### One inline command
 ```
-> stata("help regress")  #<- this won't work in Windows dued to needed batch mode
+> stata("help regress")  #<- this won't work in Windows dued to needed
+                         #   batch mode
 
 . do RStata.do
 
@@ -86,17 +87,18 @@ Syntax
 ```
 
 ### Many inline commands
+From version 0.4.0 you can do this:
 ```
-> stata(c("set obs 200", "gen a = 1"))
+stata_src <- '
 
-. do RStata.do
+version 10
+set more off
+sysuse auto
+reg mpg weight
 
-. set obs 200
-obs was 0, now 200
+'
 
-. gen a = 1
-
-. exit, clear STATA
+> stata(stata_src)
 ```
 
 ### External .do file sourceing

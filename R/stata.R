@@ -18,9 +18,20 @@
 #' @examples
 #' \dontrun{
 #' ## Single command
-#' stata("help regress") #<- this won't work in Windows dued to needed batch mode
+#' stata("help regress") #<- this won't work in Windows dued to needed
+#'                       #   batch mode
+#'
 #' ## Many commands
-#' stata(c( "set obs 200", "gen a = 1" ))
+#' stata_src <- '
+#'
+#' version 10
+#' set more off
+#' sysuse auto
+#' reg mpg weight
+#'
+#' '
+#' stata(stata_src)
+#'
 #' ## External .do file
 #' stata("foo.do")
 #'
