@@ -11,6 +11,9 @@
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
 #' @param stata.quiet logical value. If \code{TRUE} startup message will
 #' not be printed
+#' @param capture logical value. If \code{TRUE} put stata source in a
+#'     \code{capture noisily} block in order to avoid unneeded freezing (eg when making
+#'     error in stata syntax)
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -40,6 +43,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
                   stata.quiet = getOption("RStata.StataQuiet", TRUE),
+                  capture = TRUE,
                   ...
                   )
 {
@@ -113,9 +117,13 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## put a use at the top of .do if a data.frame is passed to data.in
   if (dataIn)  src <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), src)
 
+  ## capture noisily
+  if (capture)
+    src <- c('capture noisily {', '', src, '', '} /* end capture noisily */')
+
   ## set more off just to be sure nothing will freeze (hopefully :) )
   src <- c('set more off', src)
-             
+    
   ## put a save or saveold at the end of .do if data.out == TRUE
   ## for Stata 14, saveold defaults to a Stata 13 dta file
   ## -> use the (Stata 14 only) saveold option: "version(12)" to allow foreign::read.dta() read compatibility

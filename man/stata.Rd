@@ -10,7 +10,7 @@ stata(src = stop("At least 'src' must be specified"), data.in = NULL,
   stata.version = getOption("RStata.StataVersion",
   stop("You need to specify your Stata version")),
   stata.echo = getOption("RStata.StataEcho", TRUE),
-  stata.quiet = getOption("RStata.StataQuiet", TRUE), ...)
+  stata.quiet = getOption("RStata.StataQuiet", TRUE), capture = TRUE, ...)
 }
 \arguments{
 \item{src}{character vector of length 1 (path to \code{.do} file) or more
@@ -29,6 +29,10 @@ the Stata command are returned to R.}
 
 \item{stata.quiet}{logical value. If \code{TRUE} startup message will
 not be printed}
+
+\item{capture}{logical value. If \code{TRUE} put stata source in a
+\code{capture noisily} block in order to avoid unneeded freezing (eg when making
+error in stata syntax)}
 
 \item{...}{parameter passed to \code{\link{write.dta}}}
 }
