@@ -89,14 +89,14 @@ Syntax
 ### Many inline commands
 From version 0.4.0 you can do this (eg.):
 ```
-> stata_src <- '
+> stata_src <- "
 
 version 10
 set more off
 sysuse auto
 reg mpg weight
 
-'
+"
 > stata(stata_src)
 ```
 
