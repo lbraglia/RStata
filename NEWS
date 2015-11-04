@@ -2,8 +2,9 @@ RStata 0.4.1
 ----------------------------------------------------------------
 
 BUG FIXES
-* clean output removing. Now it's possibile to have knitr document
-  including Stata 'chunk'(tested on Linux)
+* cleaner output and removed unprintable chars (at the beginning of the
+output). Now it's possibile to have knitr document including Stata
+'chunk'(tested on Linux)
 
 RStata 0.4.0
 ----------------------------------------------------------------
