@@ -11,9 +11,9 @@
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
 #' @param stata.quiet logical value. If \code{TRUE} startup message will
 #' not be printed
-#' @param capture logical value. If \code{TRUE} put stata source in a
-#'     \code{capture noisily} block in order to avoid unneeded freezing (eg when making
-#'     error in stata syntax)
+## ' @param capture logical value. If \code{TRUE} put stata source in a
+## '     \code{capture noisily} block in order to avoid unneeded freezing (eg when making
+## '     error in stata syntax)
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -54,7 +54,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
                   stata.quiet = getOption("RStata.StataQuiet", TRUE),
-                  capture = TRUE,
+                  ## capture = TRUE,
                   ...
                   )
 {
@@ -79,8 +79,8 @@ stata <- function(src = stop("At least 'src' must be specified"),
   if (!is.logical(stata.quiet))
     stop("stata.quiet must be logical")
 
-  if (!is.logical(capture))
-    stop("capture must be logical")
+  ## if (!is.logical(capture))
+  ##   stop("capture must be logical")
 
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
@@ -90,7 +90,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
   stataVersion <- stata.version[1L]
   stataEcho <- stata.echo[1L]
   stataQuiet <- stata.quiet[1L]
-  Capture <- capture[1L]
+  ## Capture <- capture[1L]
 
   ## -----------------
   ## OS related config
@@ -133,9 +133,16 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## put a use at the top of .do if a data.frame is passed to data.in
   if (dataIn)  SRC <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), SRC)
 
-  ## capture noisily
-  if (Capture)
-    SRC <- c('capture noisily {', '', SRC, '', '} /* end capture noisily */')
+  ## put a placeholder around the part of interest, in order to find it
+  ## easily in order to remove overhead/setup code for each run
+  cut_me_here <- 'RSTATA: cut me here'
+
+  ## capture noisily and set cut points
+  SRC <- c('capture noisily {',
+           paste0('/*', cut_me_here, '*/'),
+           SRC,
+           paste0('/*', cut_me_here, '*/'),
+           '} /* end capture noisily */')
 
   ## set more off just to be sure nothing will freeze (hopefully :) )
   SRC <- c('set more off', SRC)
@@ -203,6 +210,10 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
   if (stataEcho) {
     if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
+    ## postprocess log, keeping only the output of interest (between rows
+    ## having /* RSTATA: cut me here */
+    cutpoints <- grep(cut_me_here, stataLog)
+    stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
     cat(stataLog, sep = "\n")
   }
   ## ------------------
@@ -212,6 +223,5 @@ stata <- function(src = stop("At least 'src' must be specified"),
     res <- foreign::read.dta(dtaOutFile, ...)
     invisible(res)
   }
-  
   
 }
