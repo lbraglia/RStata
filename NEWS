@@ -6,6 +6,7 @@ BUG FIXES
 output). Now it's possibile to have knitr document including Stata
 'chunk'(tested on Linux)
 
+
 RStata 0.4.0
 ----------------------------------------------------------------
 
