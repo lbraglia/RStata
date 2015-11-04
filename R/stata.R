@@ -124,11 +124,8 @@ stata <- function(src = stop("At least 'src' must be specified"),
   if (file.exists(SRC[1L]))
     SRC <- readLines(SRC[1L])
 
-  ## put a use at the top of .do if a data.frame is passed to data.in
-  ## if (dataIn)  SRC <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), SRC)
-
   ## put a placeholder around the part of interest, in order to find it
-  ## easily in order to remove overhead/setup code for each run
+  ## easily (when removing overhead/setup code for each run)
   cut_me_here <- 'RSTATA: cut me here'
 
   ## capture noisily and set cut points
