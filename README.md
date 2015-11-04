@@ -80,8 +80,6 @@ Syntax
         regress depvar [indepvars] [if] [in] [weight] [, options]
 
 [...]
-
-. exit, clear STATA
 ```
 
 ### Many inline commands
