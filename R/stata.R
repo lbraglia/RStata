@@ -11,9 +11,6 @@
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
 #' @param stata.quiet logical value. If \code{TRUE} startup message will
 #' not be printed
-## ' @param capture logical value. If \code{TRUE} put stata source in a
-## '     \code{capture noisily} block in order to avoid unneeded freezing (eg when making
-## '     error in stata syntax)
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -79,9 +76,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
   if (!is.logical(stata.quiet))
     stop("stata.quiet must be logical")
 
-  ## if (!is.logical(capture))
-  ##   stop("capture must be logical")
-
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
   SRC <- unlist(lapply(src, strsplit, '\n'))
@@ -131,25 +125,28 @@ stata <- function(src = stop("At least 'src' must be specified"),
     SRC <- readLines(SRC[1L])
 
   ## put a use at the top of .do if a data.frame is passed to data.in
-  if (dataIn)  SRC <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), SRC)
+  ## if (dataIn)  SRC <- c(sprintf("use %s",  file_path_sans_ext(dtaInFile)), SRC)
 
   ## put a placeholder around the part of interest, in order to find it
   ## easily in order to remove overhead/setup code for each run
   cut_me_here <- 'RSTATA: cut me here'
 
   ## capture noisily and set cut points
-  SRC <- c('capture noisily {',
-           paste0('/*', cut_me_here, '*/'),
-           SRC,
-           paste0('/*', cut_me_here, '*/'),
-           '} /* end capture noisily */')
+  SRC <- c(
+      {if (dataIn) sprintf("use %s",  file_path_sans_ext(dtaInFile)) else ''},
+      'capture noisily {',
+      paste0('/*', cut_me_here, '*/'),
+      SRC,
+      paste0('/*', cut_me_here, '*/'),
+      '} /* end capture noisily */')
 
   ## set more off just to be sure nothing will freeze (hopefully :) )
   SRC <- c('set more off', SRC)
     
   ## put a save or saveold at the end of .do if data.out == TRUE
   ## for Stata 14, saveold defaults to a Stata 13 dta file
-  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow foreign::read.dta() read compatibility
+  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
+  ## foreign::read.dta() read compatibility
   if (dataOut)  SRC <- c(SRC, sprintf("%s %s%s",
                                       ifelse(stataVersion >= 13, "saveold", "save"),
                                       file_path_sans_ext(dtaOutFile),
