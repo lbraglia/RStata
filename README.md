@@ -95,6 +95,8 @@ reg mpg weight
 
 "
 > stata(stata_src)
+
+[...]
 ```
 
 ### External .do file sourceing
@@ -112,8 +114,6 @@ reg mpg weight
     Variable |       Obs        Mean    Std. Dev.       Min        Max
 	-------------+--------------------------------------------------------
 	           a |         3   -.5603985    .3000552  -.7720861  -.2170166
-
-
 ```
 
 ### Data output from Stata
