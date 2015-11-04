@@ -66,8 +66,6 @@ See `?stata`.
 > stata("help regress")  #<- this won't work in Windows dued to needed
                          #   batch mode
 
-. do RStata.do
-
 . help regress
 
 Title
@@ -92,7 +90,6 @@ From version 0.4.0 you can do this (eg.):
 > stata_src <- "
 
 version 10
-set more off
 sysuse auto
 reg mpg weight
 
@@ -109,10 +106,6 @@ reg mpg weight
 ```
 > x <- data.frame(a = rnorm(3), b = letters[1:3])
 > stata("sum a", data.in = x)
-. do RStata.do
-
-. use RStataDataIn
-(Written by R.              )
 
 . sum a
 
@@ -120,23 +113,17 @@ reg mpg weight
 	-------------+--------------------------------------------------------
 	           a |         3   -.5603985    .3000552  -.7720861  -.2170166
 
-. exit, clear STATA
+
 ```
 
 ### Data output from Stata
 Eg in order to obtain `auto` dataset
 ```
 > auto <- stata("sysuse auto", data.out = TRUE)
-. do RStata.do 
 
 . sysuse auto
 (1978 Automobile Data)
-
-. saveold RStataDataOut
-file RStataDataOut.dta saved
-
-. exit, clear STATA
-> 
+ 
 > head(auto)
            make price mpg rep78 headroom trunk weight length turn displacement
 1   AMC Concord  4099  22     3      2.5    11   2930    186   40          121
@@ -158,18 +145,10 @@ file RStataDataOut.dta saved
 ```
 > x <- data.frame(a = rnorm(3), b = letters[1:3])
 > (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
-. do RStata.do 
-
-. use RStataDataIn
-(Written by R.              )
 
 . replace a = 2
 (3 real changes made)
 
-. saveold RStataDataOut
-file RStataDataOut.dta saved
-
-. exit, clear STATA
   a b
 1 2 a
 2 2 b
