@@ -51,7 +51,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
                   stata.quiet = getOption("RStata.StataQuiet", TRUE),
-                  ## capture = TRUE,
                   ...
                   )
 {
@@ -84,7 +83,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
   stataVersion <- stata.version[1L]
   stataEcho <- stata.echo[1L]
   stataQuiet <- stata.quiet[1L]
-  ## Capture <- capture[1L]
 
   ## -----------------
   ## OS related config
@@ -127,14 +125,15 @@ stata <- function(src = stop("At least 'src' must be specified"),
   ## put a placeholder around the part of interest, in order to find it
   ## easily (when removing overhead/setup code for each run)
   cut_me_here <- 'RSTATA: cut me here'
+  cut_me_comment <- paste0('/*', cut_me_here, '*/')
 
   ## capture noisily and set cut points
   SRC <- c(
       {if (dataIn) sprintf("use %s",  file_path_sans_ext(dtaInFile)) else ''},
       'capture noisily {',
-      paste0('/*', cut_me_here, '*/'),
+      cut_me_comment,
       SRC,
-      paste0('/*', cut_me_here, '*/'),
+      cut_me_comment,
       '} /* end capture noisily */')
 
   ## set more off just to be sure nothing will freeze (hopefully :) )
