@@ -4,8 +4,8 @@ A simple interface for `R -> Stata`, allowing the user to:
 - execute Stata commands (both inline and from a `.do` file) from R;
 - passing a `data.frame` to Stata;
 - returning a `data.frame` to R.
-
-Tested on Linux and Windows.
+- including Stata 'chunk' in knitr documents (however each one is
+  indipendent from the other;  feature tested with LaTeX/Linux) 
 
 ## Install (development version)
 
