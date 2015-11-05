@@ -14,7 +14,9 @@ You can use `devtools::install_github`
 install_github("lbraglia/RStata")
 ```
 
-Otherwise, [here](https://ci.appveyor.com/project/lbraglia/rstata/build/artifacts) you can download the Windows `.zip` and source packages for the last commit.
+Otherwise,
+[here](https://ci.appveyor.com/project/lbraglia/rstata/build/artifacts) you
+can download the Windows `.zip` and source packages for the last commit. 
 
 
 ## Setup
@@ -109,9 +111,9 @@ reg mpg weight
 
 . sum a
 
-    Variable |       Obs        Mean    Std. Dev.       Min        Max
-	-------------+--------------------------------------------------------
-	           a |         3   -.5603985    .3000552  -.7720861  -.2170166
+   Variable |       Obs        Mean    Std. Dev.       Min        Max
+------------+--------------------------------------------------------
+          a |         3   -.5603985    .3000552  -.7720861  -.2170166
 ```
 
 ### Data output from Stata
