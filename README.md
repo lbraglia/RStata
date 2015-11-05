@@ -2,9 +2,9 @@ RStata [![Build Status](https://travis-ci.org/lbraglia/RStata.svg)](https://trav
 ======
 A simple interface for `R -> Stata`, allowing the user to:
 - execute Stata commands (both inline and from a `.do` file) from R;
-- passing a `data.frame` to Stata;
-- returning a `data.frame` to R;
-- including Stata 'chunks' in knitr documents (however each chunk is
+- pass a `data.frame` to Stata;
+- return a `data.frame` to R;
+- include Stata 'chunks' in knitr documents (however each chunk is
   independent from the others;  feature tested with LaTeX/Linux).
 
 ## Install (development version)
