@@ -1,11 +1,15 @@
 Package: RStata
-Title: Experiments with R-Stata integration
-Version: 0.4.1
+Title: A bit of glue between R and Stata
+Version: 1.0.0
 Authors@R: person("Luca", "Braglia", email = "lbraglia@gmail.com", role = c("aut", "cre"))
-Description: Experiments with R-Stata integration.
+Description: A simple R -> Stata interface allowing the user to
+    execute Stata commands (both inline and from a .do file)
+    from R.
+URL: http://github.com/lbraglia/RStata
+BugReports: http://github.com/lbraglia/RStata/issues
 Imports:
     foreign,
     tools
 License: GPL-3
 LazyData: true
-RoxygenNote: 5.0.0
+RoxygenNote: 5.0.1
