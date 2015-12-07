@@ -2,5 +2,7 @@
 
 export(chooseStataBin)
 export(stata)
-import(foreign)
-import(tools)
+importFrom(foreign,read.dta)
+importFrom(foreign,write.dta)
+importFrom(tools,file_path_sans_ext)
+importFrom(utils,menu)

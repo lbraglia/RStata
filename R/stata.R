@@ -54,167 +54,177 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   ...
                   )
 {
-  ## -------------------------
-  ## Data validation and setup
-  ## -------------------------
-  if (!is.character(src))
-    stop("src must be a character")
+    ## -------------------------
+    ## Data validation and setup
+    ## -------------------------
+    if (!is.character(src))
+        stop("src must be a character")
   
-  if (!(is.null(data.in) | is.data.frame(data.in)))
-    stop("data.in must be NULL or a data.frame")
+    if (!(is.null(data.in) | is.data.frame(data.in)))
+        stop("data.in must be NULL or a data.frame")
   
-  if (!is.logical(data.out))
-    stop("data.out must be logical")
+    if (!is.logical(data.out))
+        stop("data.out must be logical")
 
-  if (!is.numeric(stata.version))
-    stop("stata.version must be logical")
+    if (!is.numeric(stata.version))
+        stop("stata.version must be logical")
 
-  if (!is.logical(stata.echo))
-    stop("stata.echo must be logical")
+    if (!is.logical(stata.echo))
+        stop("stata.echo must be logical")
 
-  if (!is.logical(stata.quiet))
-    stop("stata.quiet must be logical")
+    if (!is.logical(stata.quiet))
+        stop("stata.quiet must be logical")
 
-  OS <- Sys.info()["sysname"]
-  OS.type <- .Platform$OS.type
-  SRC <- unlist(lapply(src, strsplit, '\n'))
-  dataIn <- is.data.frame(data.in)
-  dataOut <- data.out[1L]
-  stataVersion <- stata.version[1L]
-  stataEcho <- stata.echo[1L]
-  stataQuiet <- stata.quiet[1L]
+    OS <- Sys.info()["sysname"]
+    OS.type <- .Platform$OS.type
+    SRC <- unlist(lapply(src, strsplit, '\n'))
+    dataIn <- is.data.frame(data.in)
+    dataOut <- data.out[1L]
+    stataVersion <- stata.version[1L]
+    stataEcho <- stata.echo[1L]
+    stataQuiet <- stata.quiet[1L]
 
-  ## -----------------
-  ## OS related config
-  ## -----------------
-  ## in Windows and batch mode a RStata.log (naming after RStata.do below)
-  ## is generated in the current directory 
-  if (OS %in% "Windows") {
-    winRStataLog <- "RStata.log"
-    on.exit(unlink(winRStataLog))
-  }
-  
-  ## -----
-  ## Files
-  ## -----
-  ## doFile <- tempfile("RStata", fileext = ".do")
-  ## tempfile could be misleading if the do source other dos with relative paths
-  doFile <- "RStata.do"
-  on.exit(unlink(doFile), add = TRUE)
+    ## -----------------
+    ## OS related config
+    ## -----------------
+    ## in Windows and batch mode a RStata.log (naming after RStata.do
+    ## below) is generated in the current directory
 
-  if (dataIn){
-    ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta") # Windows/Stata8 unhappy?
-    dtaInFile <- "RStataDataIn.dta"
-    on.exit(unlink(dtaInFile), add = TRUE)
-    foreign::write.dta(data.in, file = dtaInFile, version = ifelse(stataVersion >= 7, 7L, 6L), ...)
-  }  
-
-  if (dataOut) {
-    ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta") # Windows/Stata8 unhappy?
-    dtaOutFile <- "RStataDataOut.dta"
-    on.exit(unlink(dtaOutFile), add = TRUE)
-  }
-
-  ## -------------------------
-  ## Creating the .do file ...
-  ## -------------------------
-  ## External .do script 'support': KIS
-  if (file.exists(SRC[1L]))
-    SRC <- readLines(SRC[1L])
-
-  ## put a placeholder around the part of interest, in order to find it
-  ## easily (when removing overhead/setup code for each run)
-  cut_me_here <- 'RSTATA: cut me here'
-  cut_me_comment <- paste0('/*', cut_me_here, '*/')
-
-  ## capture noisily and set cut points
-  SRC <- c(
-      {if (dataIn) sprintf("use %s",  file_path_sans_ext(dtaInFile)) else ''},
-      'capture noisily {',
-      cut_me_comment,
-      SRC,
-      cut_me_comment,
-      '} /* end capture noisily */')
-
-  ## set more off just to be sure nothing will freeze (hopefully :) )
-  SRC <- c('set more off', SRC)
-    
-  ## put a save or saveold at the end of .do if data.out == TRUE
-  ## for Stata 14, saveold defaults to a Stata 13 dta file
-  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
-  ## foreign::read.dta() read compatibility
-  if (dataOut)  SRC <- c(SRC, sprintf("%s %s%s",
-                                      ifelse(stataVersion >= 13, "saveold", "save"),
-                                      file_path_sans_ext(dtaOutFile),
-                                      ifelse(stataVersion >= 14, ", version(12)", "") ))
-    
-  ## adding this command to the end simplify life if user make changes but
-  ## doesn't want a data.frame back
-  SRC <- c(SRC, "exit, clear STATA")
-
-  ## -------------
-  ## Stata command
-  ## -------------
-  quietPar <- if (!stataQuiet) {
-    ""
-  } else {
-    if (OS %in% "Linux"){
-      "-q"
-    } else if (OS %in% "Windows") {
-      "/q"
-    } else {
-      ""
+    if (OS %in% "Windows") {
+        winRStataLog <- "RStata.log"
+        on.exit(unlink(winRStataLog))
     }
-  }
-
-  ## With Windows version, /e is almost always needed (if Stata is
-  ## installed with GUI)
-  stataCmd <- paste(stata.path,
-                    ifelse(OS %in% "Windows", "/e", ""),
-                    quietPar ,
-                    "do",
-                    doFile)
-
-
-  ## ----------------
-  ## Directory change
-  ## ----------------
-  ## Move to a temp directory: on some OS (Windows) /e (batch mode with
-  ## ASCII log and no prompting without exiting from Stata) is needed. This
-  ## keeps directory clean
-  ## ... but a nested call of do file could break if relative paths are used
   
-  ## oldpwd <- getwd()
-  ## on.exit(setwd(oldpwd), add = TRUE)
-  
-  ## ---
-  ## IPC
-  ## ---
-  ## setup the .do file
-  ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
-  con <- file(doFile, "w")
-  writeLines(SRC, con)
-  close(con)
-  
-  ## execute Stata
-  rdl <- pipe(stataCmd, "r")
-  stataLog <- readLines(rdl)
-  close(rdl)
+    ## -----
+    ## Files
+    ## -----
+    ## doFile <- tempfile("RStata", fileext = ".do")
+    ## tempfile could be misleading if the do source other dos 
+    ## with relative paths
+    
+    doFile <- "RStata.do"
+    on.exit(unlink(doFile), add = TRUE)
 
-  if (stataEcho) {
-    if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
-    ## postprocess log, keeping only the output of interest (between rows
-    ## having /* RSTATA: cut me here */
-    cutpoints <- grep(cut_me_here, stataLog)
-    stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
-    cat(stataLog, sep = "\n")
-  }
-  ## ------------------
-  ## Get data outputted
-  ## ------------------
-  if (dataOut){
-    res <- foreign::read.dta(dtaOutFile, ...)
-    invisible(res)
-  }
+    if (dataIn){
+        ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
+        ## Windows/Stata8 unhappy?
+        dtaInFile <- "RStataDataIn.dta"
+        on.exit(unlink(dtaInFile), add = TRUE)
+        foreign::write.dta(data.in, file = dtaInFile,
+                           version = ifelse(stataVersion >= 7, 7L, 6L), ...)
+    }
+
+    if (dataOut) {
+        ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
+        ## Windows/Stata8 unhappy?
+        dtaOutFile <- "RStataDataOut.dta"
+        on.exit(unlink(dtaOutFile), add = TRUE)
+    }
+
+    ## -------------------------
+    ## Creating the .do file ...
+    ## -------------------------
+    
+    ## External .do script 'support': KIS
+    if (file.exists(SRC[1L]))
+        SRC <- readLines(SRC[1L])
+
+    ## put a placeholder around the part of interest, in order to find
+    ## it easily (when removing overhead/setup code for each run)
+    cut_me_here <- 'RSTATA: cut me here'
+    cut_me_comment <- paste0('/*', cut_me_here, '*/')
+
+    ## capture noisily and set cut points
+    SRC <- c(
+    {if (dataIn) sprintf("use %s", tools::file_path_sans_ext(dtaInFile))
+     else ''},
+    'capture noisily {',
+    cut_me_comment,
+    SRC,
+    cut_me_comment,
+    '} /* end capture noisily */')
+
+    ## set more off just to be sure nothing will freeze (hopefully :) )
+    SRC <- c('set more off', SRC)
+    
+    ## put a save or saveold at the end of .do if data.out == TRUE
+    ## for Stata 14, saveold defaults to a Stata 13 dta file
+    ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
+    ## foreign::read.dta() read compatibility
+    if (dataOut)
+        SRC <- c(SRC, sprintf("%s %s%s",
+                              ifelse(stataVersion >= 13, "saveold", "save"),
+                              tools::file_path_sans_ext(dtaOutFile),
+                              ifelse(stataVersion >= 14, ", version(12)", "") ))
+    
+    ## adding this command to the end simplify life if user make changes but
+    ## doesn't want a data.frame back
+    SRC <- c(SRC, "exit, clear STATA")
+
+    ## -------------
+    ## Stata command
+    ## -------------
+
+    quietPar <- if (!stataQuiet) {
+        ""
+    } else {
+        if (OS %in% "Linux"){
+            "-q"
+        } else if (OS %in% "Windows") {
+            "/q"
+        } else {
+            ""
+        }
+    }
+
+    ## With Windows version, /e is almost always needed (if Stata is
+    ## installed with GUI)
+    stataCmd <- paste(stata.path,
+                      ifelse(OS %in% "Windows", "/e", ""),
+                      quietPar ,
+                      "do",
+                      doFile)
+
+    ## ----------------
+    ## Directory change
+    ## ----------------
+    ## Move to a temp directory: on some OS (Windows) /e (batch mode with
+    ## ASCII log and no prompting without exiting from Stata) is needed. This
+    ## keeps directory clean
+    ## ... but a nested call of do file could break if relative paths are used
+    
+    ## oldpwd <- getwd()
+    ## on.exit(setwd(oldpwd), add = TRUE)
+  
+    ## ---
+    ## IPC
+    ## ---
+    ## setup the .do file
+    ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
+    con <- file(doFile, "w")
+    writeLines(SRC, con)
+    close(con)
+    
+    ## execute Stata
+    rdl <- pipe(stataCmd, "r")
+    stataLog <- readLines(rdl)
+    close(rdl)
+    
+    if (stataEcho) {
+        if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
+        ## postprocess log, keeping only the output of interest (between rows
+        ## having /* RSTATA: cut me here */
+        cutpoints <- grep(cut_me_here, stataLog)
+        stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
+        cat(stataLog, sep = "\n")
+    }
+
+    ## ------------------
+    ## Get data outputted
+    ## ------------------
+    if (dataOut){
+        res <- foreign::read.dta(dtaOutFile, ...)
+        invisible(res)
+    }
   
 }
