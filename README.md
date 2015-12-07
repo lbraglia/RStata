@@ -7,17 +7,10 @@ A simple interface for `R -> Stata`, allowing the user to:
 - include Stata 'chunks' in knitr documents (however each chunk is
   independent from the others;  feature tested with LaTeX/Linux).
 
-## Install (development version)
-
-You can use `devtools::install_github`
+## Install
 ```
-install_github("lbraglia/RStata")
+install.packages('RStata')
 ```
-
-Otherwise,
-[here](https://ci.appveyor.com/project/lbraglia/rstata/build/artifacts) you
-can download the Windows `.zip` and source packages for the last commit. 
-
 
 ## Setup
 In order to use this package you need to setup two `options`:
