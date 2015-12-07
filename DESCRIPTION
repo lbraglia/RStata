@@ -9,7 +9,8 @@ URL: http://github.com/lbraglia/RStata
 BugReports: http://github.com/lbraglia/RStata/issues
 Imports:
     foreign,
-    tools
+    tools,
+    utils
 License: GPL-3
 LazyData: true
 RoxygenNote: 5.0.1
