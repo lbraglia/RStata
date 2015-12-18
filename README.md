@@ -41,18 +41,15 @@ to set this option the first time:
   my ignorance regarding both the system itself and Stata installation
   on it, but contributions are welcome).
 
-  **Mac users** are a notable group: at this stage they should set the path
-  for the *command line* executable (not the GUI app). Eg for a Stata13 SE
-  installation in El Capitain (with default options) the path is:
-  
-  ```
-  '/Applications/Stata/StataSE.app/Contents/MacOS/stata-se'
-  ```
-  
-  In other cases (Stata licenses, installation path and so on) could be
-  slightly different (BTW, i've found the path 'exploring' the filesystem
-  with a terminal, not the graphics explorer since it 'stops' at
-  'StataSE.app').
+  **Mac users** are a notable group: at this stage they should set the
+  path for the *command line* executable (not the GUI app). Eg for a
+  Stata13 SE installation in El Capitain (with default options) the
+  path is: `
+  '/Applications/Stata/StataSE.app/Contents/MacOS/stata-se'`.  In
+  other cases (Stata licenses, installation path and so on) the path
+  could be slightly different (BTW, i've found the path 'exploring'
+  the filesystem with a terminal, not the graphics explorer since it
+  'stops' at 'StataSE.app').
   
 
 `chooseStataBin` set up `RStata.StataPath` accordingly to user advice and
