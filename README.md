@@ -44,8 +44,7 @@ to set this option the first time:
   **Mac users** are a notable group: at this stage they should set the
   path for the *command line* executable (not the GUI app). Eg for a
   Stata13 SE installation in El Capitain (with default options) the
-  path is: `
-  '/Applications/Stata/StataSE.app/Contents/MacOS/stata-se'`.  In
+  path is `'/Applications/Stata/StataSE.app/Contents/MacOS/stata-se'`.  In
   other cases (Stata licenses, installation path and so on) the path
   could be slightly different (BTW, i've found the path 'exploring'
   the filesystem with a terminal, not the graphics explorer since it
