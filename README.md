@@ -1,5 +1,10 @@
-RStata [![Build Status](https://travis-ci.org/lbraglia/RStata.svg)](https://travis-ci.org/lbraglia/RStata) [![Build status](https://ci.appveyor.com/api/projects/status/hr28hr9hu7f80cpy)](https://ci.appveyor.com/project/lbraglia/rstata)
-======
+# RStata
+
+[![Linux Build Status](https://travis-ci.org/lbraglia/RStata.svg?branch=master)](https://travis-ci.org/lbraglia/RStata)
+[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/lbraglia/RStata?svg=true)](https://ci.appveyor.com/project/lbraglia/RStata)
+[![](http://www.r-pkg.org/badges/version/RStata)](http://www.r-pkg.org/pkg/RStata)
+[![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RStata)](http://www.r-pkg.org/pkg/RStata)
+
 A simple interface for `R -> Stata`, allowing the user to:
 - execute Stata commands (both inline and from a `.do` file) from R;
 - pass a `data.frame` to Stata;
