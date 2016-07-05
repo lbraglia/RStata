@@ -1,7 +1,6 @@
 # RStata
 
 [![Linux Build Status](https://travis-ci.org/lbraglia/RStata.svg?branch=master)](https://travis-ci.org/lbraglia/RStata)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/github/lbraglia/RStata?svg=true)](https://ci.appveyor.com/project/lbraglia/RStata)
 [![](http://www.r-pkg.org/badges/version/RStata)](http://www.r-pkg.org/pkg/RStata)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RStata)](http://www.r-pkg.org/pkg/RStata)
 
