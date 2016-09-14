@@ -50,7 +50,7 @@ chooseStataBin <- function()
         ## ------------------------------
     } else if (OS %in% "Windows"){
         prog <- file.choose()
-        prog <- tools::file_path_sans_ext(prog)
+        prog <- shQuote(tools::file_path_sans_ext(prog))
         options(RStata.StataPath = prog)
         return(prog)
     } else {
