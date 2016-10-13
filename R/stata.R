@@ -9,8 +9,6 @@
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
-#' @param stata.quiet logical value. If \code{TRUE} startup message will
-#' not be printed
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -50,7 +48,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
-                  stata.quiet = getOption("RStata.StataQuiet", TRUE),
                   ...
                   )
 {
@@ -72,9 +69,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (!is.logical(stata.echo))
         stop("stata.echo must be logical")
 
-    if (!is.logical(stata.quiet))
-        stop("stata.quiet must be logical")
-
     OS <- Sys.info()["sysname"]
     OS.type <- .Platform$OS.type
     SRC <- unlist(lapply(src, strsplit, '\n'))
@@ -82,7 +76,6 @@ stata <- function(src = stop("At least 'src' must be specified"),
     dataOut <- data.out[1L]
     stataVersion <- stata.version[1L]
     stataEcho <- stata.echo[1L]
-    stataQuiet <- stata.quiet[1L]
 
     ## -----------------
     ## OS related config
@@ -98,10 +91,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## -----
     ## Files
     ## -----
-    ## doFile <- tempfile("RStata", fileext = ".do")
+
     ## tempfile could be misleading if the do source other dos 
     ## with relative paths
-    
     doFile <- "RStata.do"
     on.exit(unlink(doFile), add = TRUE)
 
@@ -155,7 +147,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
         SRC <- c(SRC, sprintf("%s %s%s",
                               ifelse(stataVersion >= 13, "saveold", "save"),
                               tools::file_path_sans_ext(dtaOutFile),
-                              ifelse(stataVersion >= 14, ", version(12)", "") ))
+                              ifelse(stataVersion >= 14, ", version(12)", "")))
     
     ## adding this command to the end simplify life if user make changes but
     ## doesn't want a data.frame back
@@ -165,36 +157,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## Stata command
     ## -------------
 
-    quietPar <- if (!stataQuiet) {
-        ""
-    } else {
-        if (OS %in% "Linux"){
-            "-q"
-        } else if (OS %in% "Windows") {
-            "/q"
-        } else {
-            ""
-        }
-    }
-
     ## With Windows version, /e is almost always needed (if Stata is
     ## installed with GUI)
     stataCmd <- paste(stata.path,
                       ifelse(OS %in% "Windows", "/e", ""),
-                      quietPar ,
                       "do",
                       doFile)
-
-    ## ----------------
-    ## Directory change
-    ## ----------------
-    ## Move to a temp directory: on some OS (Windows) /e (batch mode with
-    ## ASCII log and no prompting without exiting from Stata) is needed. This
-    ## keeps directory clean
-    ## ... but a nested call of do file could break if relative paths are used
-    
-    ## oldpwd <- getwd()
-    ## on.exit(setwd(oldpwd), add = TRUE)
   
     ## ---
     ## IPC

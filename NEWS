@@ -1,3 +1,11 @@
+RStata 1.1.0
+----------------------------------------------------------------
+
+BUG FIXES
+* chooseStataBin: fixed quoting in Stata path on Windows
+* stata: removed unused parameter stata.quiet
+* misc code cleaning
+
 RStata 1.0.0
 ----------------------------------------------------------------
 
