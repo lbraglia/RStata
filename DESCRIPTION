@@ -1,7 +1,7 @@
 Package: RStata
 Title: A Bit of Glue Between R and Stata
 Version: 1.0.0
-Authors@R: person("Luca", "Braglia", email = "lbraglia@mailbox.org", role = c("aut", "cre"))
+Authors@R: person("Luca", "Braglia", email = "lbraglia@gmail.com", role = c("aut", "cre"))
 Description: A simple R -> Stata interface allowing the user to
     execute Stata commands (both inline and from a .do file)
     from R.
