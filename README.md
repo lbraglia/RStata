@@ -165,6 +165,16 @@ Eg in order to obtain `auto` dataset
 3 2 c
 ```
 
+## Troubleshooting
+
+In some setup the package seems to freeze even with the simplest
+example (eg `stata('help regress')`).
+This is likely dued to Stata `more` option, which has to be set
+to off:
+
+```
+set more off, permanently
+```
 
 ## News
 [Here](http://raw.githubusercontent.com/lbraglia/RStata/master/NEWS).
