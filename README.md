@@ -168,7 +168,7 @@ Eg in order to obtain `auto` dataset
 ## Troubleshooting
 
 In some setup the package seems to freeze even with the simplest
-example (eg `stata('help regress')`).
+example (eg `stata('set obs 10')`).
 This is likely dued to Stata `more` option, which has to be set
 to off:
 
