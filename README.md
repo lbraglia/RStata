@@ -71,6 +71,17 @@ As above, you may consider to put this statement in your `.Rprofile`.
 ### Other options
 See `?stata`.
 
+## Troubleshooting
+
+In some setup the package seems to freeze even with the simplest
+example (eg `stata('set obs 10')`).
+This is likely dued to Stata `more` option, which has to be set
+to off:
+
+```
+set more off, permanently
+```
+
 ## Examples
 
 ### One inline command
@@ -163,17 +174,6 @@ Eg in order to obtain `auto` dataset
 1 2 a
 2 2 b
 3 2 c
-```
-
-## Troubleshooting
-
-In some setup the package seems to freeze even with the simplest
-example (eg `stata('set obs 10')`).
-This is likely dued to Stata `more` option, which has to be set
-to off:
-
-```
-set more off, permanently
 ```
 
 ## News
