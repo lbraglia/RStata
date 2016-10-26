@@ -102,8 +102,10 @@ stata <- function(src = stop("At least 'src' must be specified"),
         ## Windows/Stata8 unhappy?
         dtaInFile <- "RStataDataIn.dta"
         on.exit(unlink(dtaInFile), add = TRUE)
-        foreign::write.dta(data.in, file = dtaInFile,
-                           version = ifelse(stataVersion >= 7, 7L, 6L), ...)
+        foreign::write.dta(data.in,
+                           file = dtaInFile,
+                           version = if (stataVersion >= 7) 7L else 6L,
+                           ...)
     }
 
     if (dataOut) {
@@ -143,11 +145,13 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## for Stata 14, saveold defaults to a Stata 13 dta file
     ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
     ## foreign::read.dta() read compatibility
-    if (dataOut)
-        SRC <- c(SRC, sprintf("%s %s%s",
-                              ifelse(stataVersion >= 13, "saveold", "save"),
-                              tools::file_path_sans_ext(dtaOutFile),
-                              ifelse(stataVersion >= 14, ", version(12)", "")))
+    if (dataOut){
+        save_cmd <- sprintf("%s %s%s",
+                            if (stataVersion >= 13) "saveold" else "save",
+                            tools::file_path_sans_ext(dtaOutFile),
+                            if (stataVersion >= 14) ", version(12)" else "")
+        SRC <- c(SRC, save_cmd)
+    }
     
     ## adding this command to the end simplify life if user make changes but
     ## doesn't want a data.frame back
@@ -160,7 +164,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## With Windows version, /e is almost always needed (if Stata is
     ## installed with GUI)
     stataCmd <- paste(stata.path,
-                      ifelse(OS %in% "Windows", "/e", ""),
+                      if (OS %in% "Windows") "/e" else "",
                       "do",
                       doFile)
   
