@@ -64,7 +64,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
         stop("data.out must be logical")
 
     if (!is.numeric(stata.version))
-        stop("stata.version must be logical")
+        stop("stata.version must be numeric")
 
     if (!is.logical(stata.echo))
         stop("stata.echo must be logical")
