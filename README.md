@@ -4,7 +4,7 @@
 [![](http://www.r-pkg.org/badges/version/RStata)](http://www.r-pkg.org/pkg/RStata)
 [![CRAN RStudio mirror downloads](http://cranlogs.r-pkg.org/badges/RStata)](http://www.r-pkg.org/pkg/RStata)
 
-A simple interface for `R -> Stata`, allowing the user to:
+A simple `R -> Stata` interface allowing the user to:
 - execute Stata commands (both inline and from a `.do` file) from R;
 - pass a `data.frame` to Stata;
 - return a `data.frame` to R;
