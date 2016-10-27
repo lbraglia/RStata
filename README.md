@@ -106,7 +106,7 @@ Syntax
 ```
 
 ### Many inline commands
-From version 0.4.0 you can do this (eg.):
+You can do this (eg.):
 ```
 > stata_src <- "
 
@@ -175,9 +175,6 @@ Eg in order to obtain `auto` dataset
 2 2 b
 3 2 c
 ```
-
-## News
-[Here](http://raw.githubusercontent.com/lbraglia/RStata/master/NEWS).
 
 ## Contribute
 You are welcome to:
