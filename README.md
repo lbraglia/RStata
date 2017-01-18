@@ -73,6 +73,8 @@ See `?stata`.
 
 ## Troubleshooting
 
+### set more off, permanently
+
 In some setup the package seems to freeze even with the simplest
 example (eg `stata('set obs 10')`).
 This is likely dued to Stata `more` option, which has to be set
@@ -81,6 +83,10 @@ to off:
 ```
 set more off, permanently
 ```
+
+### avoid cd in `profile.do`
+
+See [https://github.com/lbraglia/RStata/issues/6](issue 6).
 
 ## Examples
 
