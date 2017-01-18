@@ -86,7 +86,7 @@ set more off, permanently
 
 ### avoid cd in `profile.do`
 
-See [https://github.com/lbraglia/RStata/issues/6](issue 6).
+See [issue 6](https://github.com/lbraglia/RStata/issues/6).
 
 ## Examples
 
