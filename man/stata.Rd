@@ -9,7 +9,8 @@ stata(src = stop("At least 'src' must be specified"), data.in = NULL,
   stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
   stop("You need to specify your Stata version")),
-  stata.echo = getOption("RStata.StataEcho", TRUE), ...)
+  stata.echo = getOption("RStata.StataEcho", TRUE), stata.tmp = getwd(),
+  ...)
 }
 \arguments{
 \item{src}{character vector of length 1 (path to \code{.do} file) or more
@@ -25,6 +26,8 @@ the Stata command are returned to R.}
 \item{stata.version}{Version of Stata used}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
+
+\item{stata.tmp}{Path for temporary files, defaults to working directory}
 
 \item{...}{parameter passed to \code{\link{write.dta}}}
 }
@@ -63,4 +66,3 @@ head(auto)
 (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 }
 }
-

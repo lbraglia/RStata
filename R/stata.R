@@ -9,6 +9,7 @@
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param stata.tmp Path for temporary files, defaults to working directory
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -48,6 +49,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
+                  stata.tmp = getwd(),
                   ...
                   )
 {
@@ -68,7 +70,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
     if (!is.logical(stata.echo))
         stop("stata.echo must be logical")
-
+  
     OS <- Sys.info()["sysname"]
     OS.type <- .Platform$OS.type
     SRC <- unlist(lapply(src, strsplit, '\n'))
@@ -76,6 +78,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     dataOut <- data.out[1L]
     stataVersion <- stata.version[1L]
     stataEcho <- stata.echo[1L]
+    dir.create(stata.tmp, showWarnings = FALSE)
 
     ## -----------------
     ## OS related config
@@ -84,7 +87,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## below) is generated in the current directory
 
     if (OS %in% "Windows") {
-        winRStataLog <- "RStata.log"
+        winRStataLog <- file.path(stata.tmp, "RStata.log")
         on.exit(unlink(winRStataLog))
     }
   
@@ -94,13 +97,13 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
     ## tempfile could be misleading if the do source other dos 
     ## with relative paths
-    doFile <- "RStata.do"
+    doFile <- file.path(stata.tmp, "RStata.do")
     on.exit(unlink(doFile), add = TRUE)
 
     if (dataIn){
         ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaInFile <- "RStataDataIn.dta"
+        dtaInFile <- file.path(stata.tmp, "RStataDataIn.dta")
         on.exit(unlink(dtaInFile), add = TRUE)
         foreign::write.dta(data.in,
                            file = dtaInFile,
@@ -111,7 +114,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (dataOut) {
         ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaOutFile <- "RStataDataOut.dta"
+        dtaOutFile <- file.path(stata.tmp, "RStataDataOut.dta")
         on.exit(unlink(dtaOutFile), add = TRUE)
     }
 
