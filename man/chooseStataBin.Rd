@@ -11,4 +11,3 @@ Set Stata binary (among found alternatives) path. These settings are
 lost when R is closed, therefore you should consider adding a
 \code{options("RStata.StataPath")} line in your \code{.Rprofile}.
 }
-

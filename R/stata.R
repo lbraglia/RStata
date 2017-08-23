@@ -9,6 +9,7 @@
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param stata.batch logical value. if \code{TRUE} stata will run in batch mode
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
