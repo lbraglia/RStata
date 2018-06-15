@@ -63,4 +63,3 @@ head(auto)
 (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 }
 }
-
