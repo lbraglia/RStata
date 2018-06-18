@@ -9,6 +9,7 @@
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param stata.batch logical value. if \code{TRUE} stata will run in batch mode
 #' @param ... parameter passed to \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
@@ -48,6 +49,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
+                  stata.batch = getOption("RStata.StataBatch", FALSE),
                   ...
                   )
 {
@@ -76,6 +78,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     dataOut <- data.out[1L]
     stataVersion <- stata.version[1L]
     stataEcho <- stata.echo[1L]
+    stataBatch <- stata.batch[1L]
 
     ## -----------------
     ## OS related config
@@ -83,9 +86,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## in Windows and batch mode a RStata.log (naming after RStata.do
     ## below) is generated in the current directory
 
-    if (OS %in% "Windows") {
-        winRStataLog <- "RStata.log"
-        on.exit(unlink(winRStataLog))
+    if (stataBatch | OS %in% "Windows") {
+        batchRStataLog <- "RStata.log"
+        on.exit(unlink(batchRStataLog))
     }
   
     ## -----
@@ -164,7 +167,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## With Windows version, /e is almost always needed (if Stata is
     ## installed with GUI)
     stataCmd <- paste(stata.path,
-                      if (OS %in% "Windows") "/e" else "",
+                      if (OS %in% "Windows") "/e" else if (stataBatch) "-b" else "",
                       "do",
                       doFile)
   
@@ -183,7 +186,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     close(rdl)
     
     if (stataEcho) {
-        if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
+        if (stataBatch | OS %in% "Windows") stataLog <- readLines(batchRStataLog)
         ## postprocess log, keeping only the output of interest (between rows
         ## having /* RSTATA: cut me here */
         cutpoints <- grep(cut_me_here, stataLog)
