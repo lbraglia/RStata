@@ -5,7 +5,7 @@
 \title{Send commands to a Stata process}
 \usage{
 stata(src = stop("At least 'src' must be specified"), data.in = NULL,
-  data.out = FALSE, stata.path = getOption("RStata.StataPath",
+  data.out = FALSE, returns.out = FALSE, stata.path = getOption("RStata.StataPath",
   stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
   stop("You need to specify your Stata version")),
