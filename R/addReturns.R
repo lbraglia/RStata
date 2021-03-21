@@ -149,7 +149,9 @@ get_stata_returns <- function(file){
       
       matname <- paste0(s_token[4:length(s_token)], collapse = '_')
       insheet <- as.data.frame(insheet)
-      rownames(insheet) <- insheet[,1]
+      rnames <- insheet[,1] 
+      rnames[is.na(rnames)] <- ''
+      rownames(insheet) <- rnames
       insheet <- insheet[,-1, drop=F] 
       insheet <- as.matrix(insheet)
       
