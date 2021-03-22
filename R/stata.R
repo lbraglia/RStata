@@ -6,6 +6,10 @@
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
 #' @param data.out logical value. If \code{TRUE}, the data at the end of
 #' the Stata command are returned to R.
+#' @param returns.out logical value. If \code{TRUE}, the stored results for the 
+#' active estimation and any previous results stored using the 'estimates store'
+#' command are returned to R as a list.  If specified with @param data.out, the first
+#' item of the returned list will be the data and the second item will be the returns.
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
@@ -38,6 +42,11 @@
 #' auto <- stata("sysuse auto", data.out = TRUE)
 #' head(auto)
 #'
+#'#' ## Return estimates from Stata (eg obtain return and ereturn scalars and matrices)
+#' auto <- stata("sysuse auto
+#' reg price mpg", return.out = TRUE)
+#' 
+#'
 #' ## Data input/output
 #' (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 #' }
@@ -45,6 +54,7 @@
 stata <- function(src = stop("At least 'src' must be specified"),
                   data.in = NULL,
                   data.out = FALSE,
+                  returns.out = FALSE,
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
@@ -74,6 +84,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     SRC <- unlist(lapply(src, strsplit, '\n'))
     dataIn <- is.data.frame(data.in)
     dataOut <- data.out[1L]
+    returnsOut <- returns.out[1L]
     stataVersion <- stata.version[1L]
     stataEcho <- stata.echo[1L]
 
@@ -114,6 +125,11 @@ stata <- function(src = stop("At least 'src' must be specified"),
         dtaOutFile <- "RStataDataOut.dta"
         on.exit(unlink(dtaOutFile), add = TRUE)
     }
+    
+    if (returnsOut){
+      returnOutFile <- 'ReturnsToR.xls'
+      on.exit(unlink(returnOutFile), add = TRUE)
+    }
 
     ## -------------------------
     ## Creating the .do file ...
@@ -153,6 +169,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
         SRC <- c(SRC, save_cmd)
     }
     
+    if (returnsOut){
+      SRC <- stata_return_code(SRC)
+    }
     ## adding this command to the end simplify life if user make changes but
     ## doesn't want a data.frame back
     SRC <- c(SRC, "exit, clear STATA")
@@ -190,13 +209,25 @@ stata <- function(src = stop("At least 'src' must be specified"),
         stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
         cat(stataLog, sep = "\n")
     }
-
+    
+    
     ## ------------------
     ## Get data outputted
     ## ------------------
     if (dataOut){
         res <- foreign::read.dta(dtaOutFile, ...)
-        invisible(res)
     }
-  
+    
+    if (returnsOut){
+        return <- get_stata_returns(returnOutFile)
+        if (dataOut){
+          res <- list(data = res, returns = return)
+        } 
+        else{
+          res <- return
+        }
+    }
+    
+    invisible(res)
+
 }

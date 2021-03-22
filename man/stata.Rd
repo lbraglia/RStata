@@ -5,7 +5,7 @@
 \title{Send commands to a Stata process}
 \usage{
 stata(src = stop("At least 'src' must be specified"), data.in = NULL,
-  data.out = FALSE, stata.path = getOption("RStata.StataPath",
+  data.out = FALSE, returns.out = FALSE, stata.path = getOption("RStata.StataPath",
   stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
   stop("You need to specify your Stata version")),
@@ -19,6 +19,11 @@ stata(src = stop("At least 'src' must be specified"), data.in = NULL,
 
 \item{data.out}{logical value. If \code{TRUE}, the data at the end of
 the Stata command are returned to R.}
+
+\item{returns.out}{logical value. If \code{TRUE}, the stored results for the 
+active estimation and any previous results stored using the 'estimates store'
+command are returned to R as a list.  If specified with data.out, the first
+item of the returned list will be the data and the second item will be the returns.}
 
 \item{stata.path}{Stata command to be used}
 
@@ -34,7 +39,7 @@ Function that sends commands to a Stata process.
 \examples{
 \dontrun{
 ## Single command
-stata("help regress") #<- this won't work in Windows dued to needed
+stata("help regress") #<- this won't work in Windows due to needed
                       #   batch mode
 
 ## Many commands
@@ -58,6 +63,10 @@ stata( "sum a", data.in = x)
 ## Data output from Stata (eg obtain 'auto' dataset)
 auto <- stata("sysuse auto", data.out = TRUE)
 head(auto)
+
+## Return estimates from Stata (eg obtain return and ereturn scalars and matrices)
+auto <- stata("sysuse auto
+reg price mpg", return.out = TRUE)
 
 ## Data input/output
 (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
