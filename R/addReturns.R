@@ -4,14 +4,14 @@ out <- c(SRC,"local est_name \"Active\"
 
 ***Rreturns***
   local returns : r(scalars)
-putexcel set ReturnsToR.xls, sheet(\"`est_name'_r_scalars\") modify
+version 13: putexcel set ReturnsToR.xls, sheet(\"`est_name'_r_scalars\") modify
 local i = 1
 foreach e in `returns'{
 	cap confirm scalar r(`e')
 if !_rc{
   
-  putexcel A`i' = \"`e'\"
-		putexcel B`i' = `r(`e')'
+  version 13: putexcel A`i' = (\"`e'\")
+		version 13: putexcel B`i' = (`r(`e')')
 		local ++i
 } 
 
@@ -19,32 +19,32 @@ if !_rc{
 
 local returns : r(matrices)
 foreach e in `returns' { 
-	putexcel set ReturnsToR.xls, sheet(\"`est_name'_r_matrix_`e'\") modify
-	putexcel A1 = matrix(r(`e')'), names
+	version 13: putexcel set ReturnsToR.xls, sheet(\"`est_name'_r_matrix_`e'\") modify
+	version 13: putexcel A1 = matrix(r(`e')', names)
 }
 
 ***Ereturns***
 
 local returns : e(scalars)
-putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_scalars\") modify
+version 13: putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_scalars\") modify
 local i = 1
 foreach e in `returns'{
 	cap confirm scalar e(`e')
 	if !_rc{
 
-		putexcel A`i' = \"`e'\"
-		putexcel B`i' = `e(`e')'
+		version 13: putexcel A`i' = (\"`e'\")
+		version 13: putexcel B`i' = (`e(`e')')
 		local ++i
 		} 
 
 }
 
 local returns : e(macros)
-putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_macros\") modify
+version 13: putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_macros\") modify
 local i = 1
 foreach e in `returns'{
-		putexcel A`i' = \"`e'\"
-putexcel B`i' = \"`e(`e')'\"
+		version 13: putexcel A`i' = (\"`e'\")
+version 13: putexcel B`i' = (\"`e(`e')'\")
 
 	local ++i
 }
@@ -53,8 +53,8 @@ putexcel B`i' = \"`e(`e')'\"
 local returns : e(matrices)
  
 foreach e in `returns' { 
-	putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_matrix_`e'\") modify
-	putexcel A1 = matrix(e(`e')'), names
+	version 13: putexcel set ReturnsToR.xls, sheet(\"`est_name'_e_matrix_`e'\") modify
+	version 13: putexcel A1 = matrix(e(`e')', names)
 }
 
 
@@ -65,14 +65,14 @@ foreach n in `r(names)'{
   estimates restore `n'
 	
 	local returns : r(scalars)
-	putexcel set ReturnsToR.xls, sheet(\"`n'_r_scalars\") modify
+	version 13: putexcel set ReturnsToR.xls, sheet(\"`n'_r_scalars\") modify
 	local i = 1
 	foreach e in `returns'{
 		cap confirm scalar r(`e')
 		if !_rc{
 
-			putexcel A`i' = \"`e'\"
-			putexcel B`i' = `r(`e')'
+			version 13: putexcel A`i' = (\"`e'\")
+			version 13: putexcel B`i' = (`r(`e')')
 			local ++i
 } 
 
@@ -82,32 +82,32 @@ foreach n in `r(names)'{
 
 local returns : r(matrices)
 foreach e in `returns' { 
-		putexcel set ReturnsToR.xls, sheet(\"`n'_r_matrix_`e'\") modify
-		putexcel A1 = matrix(r(`e')'), names
+		version 13: putexcel set ReturnsToR.xls, sheet(\"`n'_r_matrix_`e'\") modify
+		version 13: putexcel A1 = matrix(r(`e')', names)
 	}
 
 	***Ereturns***
 
 	local returns : e(scalars)
-	putexcel set ReturnsToR.xls, sheet(\"`n'_e_scalars\") modify
+	version 13: putexcel set ReturnsToR.xls, sheet(\"`n'_e_scalars\") modify
 	local i = 1
 	foreach e in `returns'{
 		cap confirm scalar e(`e')
 		if !_rc{
 
-			putexcel A`i' = \"`e'\"
-			putexcel B`i' = `e(`e')'
+			version 13: putexcel A`i' = (\"`e'\")
+			version 13: putexcel B`i' = (`e(`e')')
 			local ++i
 			} 
 
 }
 
 local returns : e(macros)
-putexcel set ReturnsToR.xls, sheet(\"`n'_e_macros\") modify
+version 13: putexcel set ReturnsToR.xls, sheet(\"`n'_e_macros\") modify
 local i = 1
 foreach e in `returns'{
-			putexcel A`i' = \"`e'\"
-putexcel B`i' = \"`e(`e')'\"
+			version 13: putexcel A`i' = (\"`e'\")
+version 13: putexcel B`i' = (\"`e(`e')'\")
 
 		local ++i
 	}
@@ -116,8 +116,8 @@ putexcel B`i' = \"`e(`e')'\"
 	local returns : e(matrices)
 	 
 	foreach e in `returns' { 
-		putexcel set ReturnsToR.xls, sheet(\"`n'_e_matrix_`e'\") modify
-		putexcel A1 = matrix(e(`e')'), names
+		version 13: putexcel set ReturnsToR.xls, sheet(\"`n'_e_matrix_`e'\") modify
+		version 13: putexcel A1 = matrix(e(`e')', names)
 	}
 
 }"
@@ -149,11 +149,34 @@ get_stata_returns <- function(file){
       
       matname <- paste0(s_token[4:length(s_token)], collapse = '_')
       insheet <- as.data.frame(insheet)
-      rnames <- insheet[,1] 
+      
+
+      while (all(grepl('[A-Z, a-z]', insheet[1,])|is.na(insheet[1,]))){
+        colnames(insheet) <- paste(colnames(insheet), insheet[1,], sep = '_')
+        insheet <- insheet[-1,]
+
+      }
+      
+      while (all(grepl('[A-Z, a-z]', insheet[[2]])|is.na(insheet[[2]]))){
+        insheet[,1] <- do.call(paste, c(insheet[1:2], sep='_'))
+        insheet <- insheet[,-2]
+        
+      }
+      
+   
+      
+      
+      rnames <- insheet[[1]] 
       rnames[is.na(rnames)] <- ''
       rownames(insheet) <- rnames
       insheet <- insheet[,-1, drop=F] 
-      insheet <- as.matrix(insheet)
+      
+      for (c in 1:ncol(insheet)){
+        insheet[[c]] <- as.numeric(insheet[[c]])
+      }
+      
+      
+      insheet <- as.matrix(insheet) 
       
       out[[s_token[1]]][[s_token[2]]][[s_token[3]]][[matname]] <- insheet
     }
