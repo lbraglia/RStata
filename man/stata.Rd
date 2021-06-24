@@ -4,12 +4,17 @@
 \alias{stata}
 \title{Send commands to a Stata process}
 \usage{
-stata(src = stop("At least 'src' must be specified"), data.in = NULL,
-  data.out = FALSE, stata.path = getOption("RStata.StataPath",
-  stop("You need to set up a Stata path; ?chooseStataBin")),
+stata(
+  src = stop("At least 'src' must be specified"),
+  data.in = NULL,
+  data.out = FALSE,
+  stata.path = getOption("RStata.StataPath",
+    stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
-  stop("You need to specify your Stata version")),
-  stata.echo = getOption("RStata.StataEcho", TRUE), ...)
+    stop("You need to specify your Stata version")),
+  stata.echo = getOption("RStata.StataEcho", TRUE),
+  ...
+)
 }
 \arguments{
 \item{src}{character vector of length 1 (path to \code{.do} file) or more

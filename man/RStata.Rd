@@ -3,7 +3,6 @@
 \docType{package}
 \name{RStata}
 \alias{RStata}
-\alias{RStata-package}
 \title{A Bit of Glue Between R and Stata}
 \description{
 A simple R -> Stata interface allowing the user to execute Stata
