@@ -5,13 +5,12 @@ Authors@R: person("Luca", "Braglia", email = "lbraglia@gmail.com", role = c("aut
 Description: A simple R -> Stata interface allowing the user to
     execute Stata commands (both inline and from a .do file)
     from R.
-URL: http://github.com/lbraglia/RStata
-BugReports: http://github.com/lbraglia/RStata/issues
+URL: https://github.com/lbraglia/RStata
+BugReports: https://github.com/lbraglia/RStata/issues
 Imports:
     foreign,
     tools,
     utils
 License: GPL-3
-LazyData: true
 RoxygenNote: 7.1.1
 Encoding: UTF-8
