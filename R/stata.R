@@ -48,6 +48,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
+                  dofile.name = "RStata.do",
                   ...
                   )
 {
@@ -94,7 +95,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
     ## tempfile could be misleading if the do source other dos 
     ## with relative paths
-    doFile <- "RStata.do"
+    doFile <- dofile.name
     on.exit(unlink(doFile), add = TRUE)
 
     if (dataIn){
