@@ -102,9 +102,10 @@ stata <- function(src = stop("At least 'src' must be specified"),
         ## Windows/Stata8 unhappy?
         dtaInFile <- "RStataDataIn.dta"
         on.exit(unlink(dtaInFile), add = TRUE)
-        foreign::write.dta(data.in,
+        if (stataVersion <= 7) {
+          foreign::write.dta(data.in,
                            file = dtaInFile,
-                           version = if (stataVersion >= 7) 7L else 6L,
+                           version = 6L,
                            ...)
     }
 
