@@ -202,8 +202,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## Get data outputted
     ## ------------------
     if (dataOut){
+      if (stataVersion <= 7) {
         res <- foreign::read.dta(dtaOutFile, ...)
-        invisible(res)
+      invisible(res)
     }
   
 }
