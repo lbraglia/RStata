@@ -107,6 +107,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
                            file = dtaInFile,
                            version = 6L,
                            ...)
+        } else {
+          haven_stata_version = if (stataVersion > 15) 15L else stataVersion
+          haven::write_dta(
+            data.in, path = dtaInFile, version = haven_stata_version, ...
+          )
+        }
     }
 
     if (dataOut) {
