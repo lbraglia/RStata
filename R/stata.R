@@ -204,6 +204,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (dataOut){
       if (stataVersion <= 7) {
         res <- foreign::read.dta(dtaOutFile, ...)
+      } else {
+        res <- haven::read_dta(dtaOutFile, ...)
+      }
       invisible(res)
     }
   
