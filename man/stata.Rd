@@ -8,6 +8,7 @@ stata(
   src = stop("At least 'src' must be specified"),
   data.in = NULL,
   data.out = FALSE,
+  saveold = FALSE,
   stata.path = getOption("RStata.StataPath",
     stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
@@ -17,13 +18,16 @@ stata(
 )
 }
 \arguments{
-\item{src}{character vector of length 1 (path to \code{.do} file) or more
-(a set of stata commands). See examples.}
+\item{src}{character vector of length 1 (path to \code{.do} file) or more (a
+set of stata commands). See examples.}
 
 \item{data.in}{\code{\link{data.frame}} to be passed to Stata}
 
 \item{data.out}{logical value. If \code{TRUE}, the data at the end of
 the Stata command are returned to R.}
+
+\item{saveold}{logical value.If returning data to R and using Stata version 13+, use
+saveold in Stata to save dataset. Defaults to FALSE.}
 
 \item{stata.path}{Stata command to be used}
 
@@ -31,10 +35,14 @@ the Stata command are returned to R.}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
 
-\item{...}{parameter passed to \code{\link{write.dta}}}
+\item{...}{parameter passed to \code{\link{write_dta}} or \code{\link{write.dta}}}
 }
 \description{
 Function that sends commands to a Stata process.
+}
+\details{
+It uses \code{\link[haven]{haven}} for Stata version 8 and beyond, and uses
+\code{foreign} for Stata version 7 and prior.
 }
 \examples{
 \dontrun{

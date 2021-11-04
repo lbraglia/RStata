@@ -1,15 +1,21 @@
 #' Send commands to a Stata process
 #'
 #' Function that sends commands to a Stata process.
-#' @param src character vector of length 1 (path to \code{.do} file) or more
-#' (a set of stata commands). See examples.
+#'
+#' It uses \code{\link[haven]{haven}} for Stata version 8 and beyond, and uses
+#' \code{foreign} for Stata version 7 and prior.
+#'
+#' @param src character vector of length 1 (path to \code{.do} file) or more (a
+#'   set of stata commands). See examples.
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
 #' @param data.out logical value. If \code{TRUE}, the data at the end of
 #' the Stata command are returned to R.
+#' @param saveold logical value.If returning data to R and using Stata version 13+, use
+#'  saveold in Stata to save dataset. Defaults to FALSE.
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
-#' @param ... parameter passed to \code{\link{write.dta}}
+#' @param ... parameter passed to \code{\link{write_dta}} or \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
 #' ## Single command
