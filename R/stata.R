@@ -45,6 +45,7 @@
 stata <- function(src = stop("At least 'src' must be specified"),
                   data.in = NULL,
                   data.out = FALSE,
+                  saveold = FALSE,
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
@@ -154,9 +155,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## foreign::read.dta() read compatibility
     if (dataOut){
         save_cmd <- sprintf("%s %s%s",
-                            if (stataVersion >= 13) "saveold" else "save",
+                            if (stataVersion >= 13 & saveold) "saveold" else "save",
                             tools::file_path_sans_ext(dtaOutFile),
-                            if (stataVersion >= 14) ", version(12)" else "")
+                            if (stataVersion >= 14 & saveold) ", version(12)" else "")
         SRC <- c(SRC, save_cmd)
     }
     
