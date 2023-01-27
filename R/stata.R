@@ -1,21 +1,36 @@
 #' Send commands to a Stata process
 #'
 #' Function that sends commands to a Stata process.
+#' @param src character vector of length 1 (path to \code{.do} file) or more
+#' (a set of stata commands). See examples.
+#' @param data.in \code{\link{data.frame}} to be passed to Stata
+#' @param data.out logical value. If \code{TRUE}, the data at the end of
+#' the Stata command are returned to R.
+#' @param stata.path Stata command to be used
+#' @param stata.version Version of Stata used
+#' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param ... parameter passed to \code{\link{write.dta}}
 #'
-#' It uses \code{\link[haven]{haven}} for Stata version 8 and beyond, and uses
-#' \code{foreign} for Stata version 7 and prior.
+#' It uses \code{\link[haven]{haven}} (default) or
+#' \code{\link[readstata13]{readstata13}} for Stata version 8 and beyond, and
+#' uses \code{foreign} for Stata version 7 and prior.
 #'
 #' @param src character vector of length 1 (path to \code{.do} file) or more (a
 #'   set of stata commands). See examples.
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
-#' @param data.out logical value. If \code{TRUE}, the data at the end of
-#' the Stata command are returned to R.
-#' @param saveold logical value.If returning data to R and using Stata version 13+, use
-#'  saveold in Stata to save dataset. Defaults to FALSE.
+#' @param data.out logical value. If \code{TRUE}, the data at the end of the
+#'   Stata command are returned to R.
+#' @param saveold logical value.If returning data to R and using Stata version
+#'   13+, use saveold in Stata to save dataset. Defaults to FALSE.
+#' @param package character string. R package to use to read/write Stata
+#'   datasets for Stata versions 8 and beyond. can either be \code{"haven"} or
+#'   \code{"readstata13"}. defaults to \code{"haven"}.
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
-#' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
-#' @param ... parameter passed to \code{\link{write_dta}} or \code{\link{write.dta}}
+#' @param stata.echo logical value. If \code{TRUE} stata text output will be
+#'   printed
+#' @param ... parameter passed to \code{\link{write_dta}} or
+#'   \code{\link{write.dta}}
 #' @examples
 #' \dontrun{
 #' ## Single command
@@ -51,7 +66,9 @@
 stata <- function(src = stop("At least 'src' must be specified"),
                   data.in = NULL,
                   data.out = FALSE,
+
                   saveold = FALSE,
+                  package = "haven",
                   stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
                   stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
                   stata.echo = getOption("RStata.StataEcho", TRUE),
@@ -75,6 +92,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
     if (!is.logical(stata.echo))
         stop("stata.echo must be logical")
+  
+    if (!package %in% c("haven", "readstata13"))
+        stop("package must be either 'haven' or 'readstata13'")
 
     OS <- Sys.info()["sysname"]
     OS.type <- .Platform$OS.type
@@ -115,10 +135,19 @@ stata <- function(src = stop("At least 'src' must be specified"),
                            version = 6L,
                            ...)
         } else {
-          haven_stata_version = if (stataVersion > 15) 15L else stataVersion
-          haven::write_dta(
-            data.in, path = dtaInFile, version = haven_stata_version, ...
-          )
+          package_stata_version = if (stataVersion > 15) 15L else stataVersion
+          
+          if (package == "haven") {
+            haven::write_dta(
+              data.in, path = dtaInFile, version = package_stata_version, ...
+            )
+          }
+          
+          if (package == "readstata13") {
+            readstata13::save.dta13(
+              data.in, file = dtaInFile, version = package_stata_version, ...
+            )
+          }
         }
     }
 
@@ -161,9 +190,9 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## foreign::read.dta() read compatibility
     if (dataOut){
         save_cmd <- sprintf("%s %s%s",
-                            if (stataVersion >= 13 & saveold) "saveold" else "save",
+                            if (stataVersion >= 13) "saveold" else "save",
                             tools::file_path_sans_ext(dtaOutFile),
-                            if (stataVersion >= 14 & saveold) ", version(12)" else "")
+                            if (stataVersion >= 14) ", version(12)" else "")
         SRC <- c(SRC, save_cmd)
     }
     
@@ -208,13 +237,17 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## ------------------
     ## Get data outputted
     ## ------------------
-    if (dataOut){
+    if (dataOut) {
       if (stataVersion <= 7) {
         res <- foreign::read.dta(dtaOutFile, ...)
-      } else {
+      }
+      else if (package == "haven") {
         res <- haven::read_dta(dtaOutFile, ...)
       }
+      else if (package == "readstata13") {
+        res <- readstata13::read.dta13(dtaOutFile, ...)
+      }
+      
       invisible(res)
     }
-  
 }

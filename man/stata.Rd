@@ -9,6 +9,7 @@ stata(
   data.in = NULL,
   data.out = FALSE,
   saveold = FALSE,
+  package = "haven",
   stata.path = getOption("RStata.StataPath",
     stop("You need to set up a Stata path; ?chooseStataBin")),
   stata.version = getOption("RStata.StataVersion",
@@ -23,26 +24,28 @@ set of stata commands). See examples.}
 
 \item{data.in}{\code{\link{data.frame}} to be passed to Stata}
 
-\item{data.out}{logical value. If \code{TRUE}, the data at the end of
-the Stata command are returned to R.}
+\item{data.out}{logical value. If \code{TRUE}, the data at the end of the
+Stata command are returned to R.}
 
-\item{saveold}{logical value.If returning data to R and using Stata version 13+, use
-saveold in Stata to save dataset. Defaults to FALSE.}
+\item{saveold}{logical value.If returning data to R and using Stata version
+13+, use saveold in Stata to save dataset. Defaults to FALSE.}
+
+\item{package}{character string. R package to use to read/write Stata
+datasets for Stata versions 8 and beyond. can either be \code{"haven"} or
+\code{"readstata13"}. defaults to \code{"haven"}.}
 
 \item{stata.path}{Stata command to be used}
 
 \item{stata.version}{Version of Stata used}
 
-\item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
+\item{stata.echo}{logical value. If \code{TRUE} stata text output will be
+printed}
 
-\item{...}{parameter passed to \code{\link{write_dta}} or \code{\link{write.dta}}}
+\item{...}{parameter passed to \code{\link{write_dta}} or
+\code{\link{write.dta}}}
 }
 \description{
 Function that sends commands to a Stata process.
-}
-\details{
-It uses \code{\link[haven]{haven}} for Stata version 8 and beyond, and uses
-\code{foreign} for Stata version 7 and prior.
 }
 \examples{
 \dontrun{
