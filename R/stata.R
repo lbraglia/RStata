@@ -188,11 +188,12 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## for Stata 14, saveold defaults to a Stata 13 dta file
     ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
     ## foreign::read.dta() read compatibility
-    if (dataOut){
-        save_cmd <- sprintf("%s %s%s",
-                            if (stataVersion >= 13) "saveold" else "save",
-                            tools::file_path_sans_ext(dtaOutFile),
-                            if (stataVersion >= 14) ", version(12)" else "")
+    if (dataOut) {
+        save_cmd <- sprintf(
+          "%s %s%s",
+          if (stataVersion >= 13 & saveold) "saveold" else "save",
+          tools::file_path_sans_ext(dtaOutFile),
+          if (stataVersion >= 14 & saveold) ", version(12)" else "")
         SRC <- c(SRC, save_cmd)
     }
     
