@@ -10,8 +10,9 @@ BugReports: https://github.com/lbraglia/RStata/issues
 Imports:
     foreign,
     haven,
+    readstata13,
     tools,
     utils
 License: GPL-3
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Encoding: UTF-8
