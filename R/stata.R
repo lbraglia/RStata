@@ -145,7 +145,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
           
           if (package == "readstata13") {
             readstata13::save.dta13(
-              data.in, file = dtaInFile, version = package_stata_version, ...
+              data.in, file = dtaInFile, version = 13, ...
             )
           }
         }
