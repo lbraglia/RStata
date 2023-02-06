@@ -127,8 +127,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (dataIn){
         ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaInFile <- "RStataDataIn.dta"
-        on.exit(unlink(dtaInFile), add = TRUE)
+        dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
         if (stataVersion <= 7) {
           foreign::write.dta(data.in,
                            file = dtaInFile,
@@ -145,7 +144,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
           
           if (package == "readstata13") {
             readstata13::save.dta13(
-              data.in, file = dtaInFile, version = 13, ...
+              as.data.frame(data.in), file = dtaInFile, version = 13, ...
             )
           }
         }
@@ -154,7 +153,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (dataOut) {
         ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaOutFile <- "RStataDataOut.dta"
+        dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
         on.exit(unlink(dtaOutFile), add = TRUE)
     }
 
