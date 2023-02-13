@@ -63,191 +63,214 @@
 #' (y <- stata("replace a = 2", data.in = x, data.out = TRUE))
 #' }
 #' @export
-stata <- function(src = stop("At least 'src' must be specified"),
-                  data.in = NULL,
-                  data.out = FALSE,
-
-                  saveold = FALSE,
-                  package = "haven",
-                  stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
-                  stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
-                  stata.echo = getOption("RStata.StataEcho", TRUE),
-                  ...
-                  )
-{
-    ## -------------------------
-    ## Data validation and setup
-    ## -------------------------
-    if (!is.character(src))
-        stop("src must be a character")
+stata <- function(
+  src = stop("At least 'src' must be specified"),
+  data.in = NULL,
+  data.out = FALSE,
+  saveold = FALSE,
+  package = "haven",
+  stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
+  stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
+  stata.echo = getOption("RStata.StataEcho", TRUE),
+  ...
+) {
+  ## -------------------------
+  ## Data validation and setup
+  ## -------------------------
+  if (!is.character(src))
+    stop("src must be a character")
   
-    if (!(is.null(data.in) | is.data.frame(data.in)))
-        stop("data.in must be NULL or a data.frame")
+  if (!(is.null(data.in) | is.data.frame(data.in)))
+    stop("data.in must be NULL or a data.frame")
   
-    if (!is.logical(data.out))
-        stop("data.out must be logical")
-
-    if (!is.numeric(stata.version))
-        stop("stata.version must be numeric")
-
-    if (!is.logical(stata.echo))
-        stop("stata.echo must be logical")
+  if (!is.logical(data.out))
+    stop("data.out must be logical")
   
-    if (!package %in% c("haven", "readstata13"))
-        stop("package must be either 'haven' or 'readstata13'")
-
-    OS <- Sys.info()["sysname"]
-    OS.type <- .Platform$OS.type
-    SRC <- unlist(lapply(src, strsplit, '\n'))
-    dataIn <- is.data.frame(data.in)
-    dataOut <- data.out[1L]
-    stataVersion <- stata.version[1L]
-    stataEcho <- stata.echo[1L]
-
-    ## -----------------
-    ## OS related config
-    ## -----------------
-    ## in Windows and batch mode a RStata.log (naming after RStata.do
-    ## below) is generated in the current directory
-
-    if (OS %in% "Windows") {
-        winRStataLog <- "RStata.log"
-        on.exit(unlink(winRStataLog))
+  if (!is.numeric(stata.version))
+    stop("stata.version must be numeric")
+  
+  if (!is.logical(stata.echo))
+    stop("stata.echo must be logical")
+  
+  if (!package %in% c("haven", "readstata13"))
+    stop("package must be either 'haven' or 'readstata13'")
+  
+  OS <- Sys.info()["sysname"]
+  OS.type <- .Platform$OS.type
+  SRC <- unlist(lapply(src, strsplit, '\n'))
+  dataIn <- is.data.frame(data.in)
+  dataOut <- data.out[1L]
+  stataVersion <- stata.version[1L]
+  stataEcho <- stata.echo[1L]
+  
+  ## -----------------
+  ## OS related config
+  ## -----------------
+  ## in Windows and batch mode a RStata.log (naming after RStata.do
+  ## below) is generated in the current directory
+  
+  if (OS %in% "Windows") {
+    winRStataLog <- "RStata.log"
+    on.exit(unlink(winRStataLog))
+  }
+  
+  ## -----
+  ## Files
+  ## -----
+  
+  ## tempfile could be misleading if the do source other dos 
+  ## with relative paths
+  doFile <- "RStata.do"
+  on.exit(unlink(doFile), add = TRUE)
+  
+  if (dataIn){
+    ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
+    ## Windows/Stata8 unhappy?
+    dtaInFile <- fs::file_temp("RStataDataIn", ext = ".dta")
+    if (stataVersion <= 7) {
+      foreign::write.dta(
+        data.in,
+        file = dtaInFile,
+        version = 6L,
+        ...
+      )
+    } else {
+      package_stata_version = if (stataVersion > 15) 15L else stataVersion
+      
+      if (package == "haven") {
+        haven::write_dta(
+          data.in, path = dtaInFile, version = package_stata_version, ...
+        )
+      }
+      
+      if (package == "readstata13") {
+        readstata13::save.dta13(
+          as.data.frame(data.in), file = dtaInFile, version = 13, ...
+        )
+      }
     }
+  }
   
-    ## -----
-    ## Files
-    ## -----
-
-    ## tempfile could be misleading if the do source other dos 
-    ## with relative paths
-    doFile <- "RStata.do"
-    on.exit(unlink(doFile), add = TRUE)
-
-    if (dataIn){
-        ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
-        ## Windows/Stata8 unhappy?
-        dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
-        if (stataVersion <= 7) {
-          foreign::write.dta(data.in,
-                           file = dtaInFile,
-                           version = 6L,
-                           ...)
-        } else {
-          package_stata_version = if (stataVersion > 15) 15L else stataVersion
-          
-          if (package == "haven") {
-            haven::write_dta(
-              data.in, path = dtaInFile, version = package_stata_version, ...
-            )
-          }
-          
-          if (package == "readstata13") {
-            readstata13::save.dta13(
-              as.data.frame(data.in), file = dtaInFile, version = 13, ...
-            )
-          }
-        }
-    }
-
-    if (dataOut) {
-        ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
-        ## Windows/Stata8 unhappy?
-        dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
-        on.exit(unlink(dtaOutFile), add = TRUE)
-    }
-
-    ## -------------------------
-    ## Creating the .do file ...
-    ## -------------------------
+  if (dataOut) {
+    ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
+    ## Windows/Stata8 unhappy?
+    dtaOutFile <- fs::file_temp("RStataDataOut", ext = ".dta")
+    # on.exit(unlink(dtaOutFile), add = TRUE)
+  }
+  
+  ## -------------------------
+  ## Creating the .do file ...
+  ## -------------------------
+  
+  ## External .do script 'support': KIS
+  if (file.exists(SRC[1L]))
+    SRC <- readLines(SRC[1L])
+  
+  ## put a placeholder around the part of interest, in order to find
+  ## it easily (when removing overhead/setup code for each run)
+  cut_me_here <- 'RSTATA: cut me here'
+  cut_me_comment <- paste0('/*', cut_me_here, '*/')
+  
+  ## capture noisily and set cut points
+  SRC <- c(
+    ifelse(
+      dataIn,
+      sprintf("use %s", tools::file_path_sans_ext(dtaInFile)),
+      ''
     
-    ## External .do script 'support': KIS
-    if (file.exists(SRC[1L]))
-        SRC <- readLines(SRC[1L])
-
-    ## put a placeholder around the part of interest, in order to find
-    ## it easily (when removing overhead/setup code for each run)
-    cut_me_here <- 'RSTATA: cut me here'
-    cut_me_comment <- paste0('/*', cut_me_here, '*/')
-
-    ## capture noisily and set cut points
-    SRC <- c(
-    {if (dataIn) sprintf("use %s", tools::file_path_sans_ext(dtaInFile))
-     else ''},
+    ),
     'capture noisily {',
     cut_me_comment,
     SRC,
     cut_me_comment,
-    '} /* end capture noisily */')
-
-    ## set more off just to be sure nothing will freeze (hopefully :) )
-    SRC <- c('set more off', SRC)
-    
-    ## put a save or saveold at the end of .do if data.out == TRUE
-    ## for Stata 14, saveold defaults to a Stata 13 dta file
-    ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
-    ## foreign::read.dta() read compatibility
-    if (dataOut) {
-        save_cmd <- sprintf(
-          "%s %s%s",
-          if (stataVersion >= 13 & saveold) "saveold" else "save",
-          tools::file_path_sans_ext(dtaOutFile),
-          if (stataVersion >= 14 & saveold) ", version(12)" else "")
-        SRC <- c(SRC, save_cmd)
-    }
-    
-    ## adding this command to the end simplify life if user make changes but
-    ## doesn't want a data.frame back
-    SRC <- c(SRC, "exit, clear STATA")
-
-    ## -------------
-    ## Stata command
-    ## -------------
-
-    ## With Windows version, /e is almost always needed (if Stata is
-    ## installed with GUI)
-    stataCmd <- paste(stata.path,
-                      if (OS %in% "Windows") "/e" else "",
-                      "do",
-                      doFile)
+    '} /* end capture noisily */'
+  )
   
-    ## ---
-    ## IPC
-    ## ---
-    ## setup the .do file
-    ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
-    con <- file(doFile, "w")
-    writeLines(SRC, con)
-    close(con)
-    
-    ## execute Stata
-    rdl <- pipe(stataCmd, "r")
-    stataLog <- readLines(rdl)
-    close(rdl)
-    
-    if (stataEcho) {
-        if (OS %in% "Windows") stataLog <- readLines(winRStataLog)
-        ## postprocess log, keeping only the output of interest (between rows
-        ## having /* RSTATA: cut me here */
-        cutpoints <- grep(cut_me_here, stataLog)
-        stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
-        cat(stataLog, sep = "\n")
+  ## set more off just to be sure nothing will freeze (hopefully :) )
+  SRC <- c('set more off', SRC)
+  
+  ## put a save or saveold at the end of .do if data.out == TRUE
+  ## for Stata 14, saveold defaults to a Stata 13 dta file
+  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
+  ## foreign::read.dta() read compatibility
+  if (dataOut) {
+    # save_cmd <- sprintf(
+    #   "%s %s%s",
+    #   ifelse(stataVersion >= 13 & saveold, "saveold", "save"),
+    #   tools::file_path_sans_ext(dtaOutFile),
+    #   ifelse(stataVersion >= 14 & saveold, ", version(12)", "")
+    save_version = ifelse(stataVersion >= 13 & saveold, "saveold", "save")
+    save_options = ifelse(stataVersion >= 14 & saveold, ", version(12)", "")
+    save_cmd = glue::glue('{save_version} "{dtaOutFile}"{save_options}')
+    SRC <- c(SRC, save_cmd)
+  }
+  
+  ## adding this command to the end simplify life if user make changes but
+  ## doesn't want a data.frame back
+  SRC <- c(SRC, "exit, clear STATA")
+  
+  ## -------------
+  ## Stata command
+  ## -------------
+  
+  ## With Windows version, /e is almost always needed (if Stata is
+  ## installed with GUI)
+  stataCmd <- paste(
+    stata.path,
+    ifelse(OS %in% "Windows", "/e", ""),
+    "do",
+    doFile
+  )
+  
+  ## ---
+  ## IPC
+  ## ---
+  ## setup the .do file
+  ## con <- fifo(doFile, "w+") # <- freeze with fifo in Window
+  con <- file(doFile, "w")
+  writeLines(SRC, con)
+  close(con)
+  
+  ## execute Stata
+  # rdl <- pipe(stataCmd, "r")
+  processx::run(
+    "C:/Program Files/Stata17/StataMP-64.exe",
+    args = c(
+      "/e",
+      doFile
+    ),
+    echo_cmd = TRUE,
+    echo = TRUE,
+    stdout = "stdout.txt",
+    stderr_to_stdout = TRUE
+  )
+  stataLog <- readLines("stdout.txt")
+  # close(rdl)
+  
+  if (stataEcho) {
+    if (OS %in% "Windows")
+      stataLog <- readLines(winRStataLog)
+    ## postprocess log, keeping only the output of interest (between rows
+    ## having /* RSTATA: cut me here */
+    cutpoints <- grep(cut_me_here, stataLog)
+    stataLog <- stataLog[seq.int(cutpoints[1] + 1, cutpoints[2] - 1)]
+    cat(stataLog, sep = "\n")
+  }
+  
+  ## ------------------
+  ## Get data outputted
+  ## ------------------
+  if (dataOut) {
+    if (stataVersion <= 7) {
+      res <- foreign::read.dta(dtaOutFile, ...)
     }
-
-    ## ------------------
-    ## Get data outputted
-    ## ------------------
-    if (dataOut) {
-      if (stataVersion <= 7) {
-        res <- foreign::read.dta(dtaOutFile, ...)
-      }
-      else if (package == "haven") {
-        res <- haven::read_dta(dtaOutFile, ...)
-      }
-      else if (package == "readstata13") {
-        res <- readstata13::read.dta13(dtaOutFile, ...)
-      }
-      
-      invisible(res)
+    else if (package == "haven") {
+      res <- haven::read_dta(dtaOutFile, ...)
     }
+    else if (package == "readstata13") {
+      res <- readstata13::read.dta13(dtaOutFile, ...)
+    }
+    
+    invisible(res)
+  }
 }
