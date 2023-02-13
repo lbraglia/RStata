@@ -124,8 +124,6 @@ stata <- function(
   on.exit(unlink(doFile), add = TRUE)
   
   if (dataIn){
-    ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
-    ## Windows/Stata8 unhappy?
     dtaInFile <- fs::file_temp("RStataDataIn", ext = ".dta")
     if (stataVersion <= 7) {
       foreign::write.dta(
@@ -152,10 +150,7 @@ stata <- function(
   }
   
   if (dataOut) {
-    ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
-    ## Windows/Stata8 unhappy?
     dtaOutFile <- fs::file_temp("RStataDataOut", ext = ".dta")
-    # on.exit(unlink(dtaOutFile), add = TRUE)
   }
   
   ## -------------------------
@@ -188,20 +183,17 @@ stata <- function(
   
   ## set more off just to be sure nothing will freeze (hopefully :) )
   SRC <- c('set more off', SRC)
-  
-  ## put a save or saveold at the end of .do if data.out == TRUE
-  ## for Stata 14, saveold defaults to a Stata 13 dta file
-  ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
-  ## foreign::read.dta() read compatibility
+ 
   if (dataOut) {
-    # save_cmd <- sprintf(
-    #   "%s %s%s",
-    #   ifelse(stataVersion >= 13 & saveold, "saveold", "save"),
-    #   tools::file_path_sans_ext(dtaOutFile),
-    #   ifelse(stataVersion >= 14 & saveold, ", version(12)", "")
+    ## put a save or saveold at the end of .do if data.out == TRUE
     save_version = ifelse(stataVersion >= 13 & saveold, "saveold", "save")
+    ## for Stata 14, saveold defaults to a Stata 13 dta file
+    ## -> use the (Stata 14 only) saveold option: "version(12)" to allow
+    ## foreign::read.dta() read compatibility
     save_options = ifelse(stataVersion >= 14 & saveold, ", version(12)", "")
+    
     save_cmd = glue::glue('{save_version} "{dtaOutFile}"{save_options}')
+    
     SRC <- c(SRC, save_cmd)
   }
   
@@ -232,7 +224,6 @@ stata <- function(
   close(con)
   
   ## execute Stata
-  # rdl <- pipe(stataCmd, "r")
   processx::run(
     "C:/Program Files/Stata17/StataMP-64.exe",
     args = c(
@@ -245,8 +236,7 @@ stata <- function(
     stderr_to_stdout = TRUE
   )
   stataLog <- readLines("stdout.txt")
-  # close(rdl)
-  
+
   if (stataEcho) {
     if (OS %in% "Windows")
       stataLog <- readLines(winRStataLog)
