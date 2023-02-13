@@ -205,15 +205,6 @@ stata <- function(
   ## Stata command
   ## -------------
   
-  ## With Windows version, /e is almost always needed (if Stata is
-  ## installed with GUI)
-  stataCmd <- paste(
-    stata.path,
-    ifelse(OS %in% "Windows", "/e", ""),
-    "do",
-    doFile
-  )
-  
   ## ---
   ## IPC
   ## ---
@@ -223,15 +214,19 @@ stata <- function(
   writeLines(SRC, con)
   close(con)
   
+  stata_args = doFile
+  
+  ## With Windows version, /e is almost always needed (if Stata is
+  ## installed with GUI)
+  if (OS %in% "Windows")
+    stata_args = c("/e", stata_args)
+  
   ## execute Stata
   processx::run(
-    "C:/Program Files/Stata17/StataMP-64.exe",
-    args = c(
-      "/e",
-      doFile
-    ),
-    echo_cmd = TRUE,
-    echo = TRUE,
+    stata.path,
+    args = stata_args,
+    echo_cmd = stata.echo,
+    echo = stata.echo,
     stdout = "stdout.txt",
     stderr_to_stdout = TRUE
   )
