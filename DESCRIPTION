@@ -14,7 +14,9 @@ Imports:
     haven,
     readstata13,
     tools,
-    utils
+    utils,
+    processx,
+    fs
 License: GPL-3
 RoxygenNote: 7.2.0
 Encoding: UTF-8
