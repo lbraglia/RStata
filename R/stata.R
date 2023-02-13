@@ -170,9 +170,9 @@ stata <- function(
   SRC <- c(
     ifelse(
       dataIn,
-      sprintf("use %s", tools::file_path_sans_ext(dtaInFile)),
+      # sprintf("use %s", tools::file_path_sans_ext(dtaInFile)),
+      glue::glue("use {dtaInFile}"),
       ''
-    
     ),
     'capture noisily {',
     cut_me_comment,
