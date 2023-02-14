@@ -69,8 +69,8 @@ stata <- function(
   data.out = FALSE,
   saveold = FALSE,
   package = "haven",
-  stata.path = getOption("RStata.StataPath", stop("You need to set up a Stata path; ?chooseStataBin")),
-  stata.version = getOption("RStata.StataVersion", stop("You need to specify your Stata version")),
+  stata.path = getOption("RStata.StataPath", Sys.getenv("STATA_PATH")),
+  stata.version = getOption("RStata.StataVersion", Sys.getenv("STATA_VERSION")),
   stata.echo = getOption("RStata.StataEcho", TRUE),
   ...
 ) {
@@ -86,6 +86,9 @@ stata <- function(
   if (!is.logical(data.out))
     stop("data.out must be logical")
   
+  if (is.null(stata.version) | stata.version == "")
+    stop("You need to specify your Stata version")
+  
   if (!is.numeric(stata.version))
     stop("stata.version must be numeric")
   
@@ -94,6 +97,9 @@ stata <- function(
   
   if (!package %in% c("haven", "readstata13"))
     stop("package must be either 'haven' or 'readstata13'")
+  
+  if (is.null(stata.path) | stata.path == "")
+    stop("You need to set up a Stata path; ?chooseStataBin")
   
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
