@@ -253,8 +253,8 @@ stata <- function(
   processx::run(
     stata.path,
     args = stata_args,
-    echo_cmd = stata.echo,
-    echo = stata.echo,
+    echo_cmd = FALSE,
+    echo = FALSE,
     stdout = "stdout.txt",
     stderr_to_stdout = TRUE
   )

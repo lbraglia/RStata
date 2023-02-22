@@ -3,7 +3,6 @@
     Code
       stata("sum", mtcars)
     Output
-      Running "C:\\Program Files\\Stata17\\StataMP-64.exe" /e RStata.do
       . sum
       
           Variable |        Obs        Mean    Std. dev.       Min        Max
@@ -27,7 +26,6 @@
     Code
       stata("sum", mtcars, data.out = TRUE)
     Output
-      Running "C:\\Program Files\\Stata17\\StataMP-64.exe" /e RStata.do
       . sum
       
           Variable |        Obs        Mean    Std. dev.       Min        Max
@@ -197,7 +195,6 @@
     Code
       stata(testthat::test_path("fixtures/test.do"), mtcars)
     Output
-      Running "C:\\Program Files\\Stata17\\StataMP-64.exe" /e RStata.do
       . sum
       
           Variable |        Obs        Mean    Std. dev.       Min        Max
@@ -222,7 +219,6 @@
     Code
       stata(testthat::test_path("fixtures/test.do"), mtcars, data.out = TRUE)
     Output
-      Running "C:\\Program Files\\Stata17\\StataMP-64.exe" /e RStata.do
       . sum
       
           Variable |        Obs        Mean    Std. dev.       Min        Max
