@@ -248,6 +248,8 @@ stata <- function(
   if (OS %in% "Windows")
     stata_args = c("/e", stata_args)
   
+  on.exit(unlink("stdout.txt"), add = TRUE)
+  
   ## execute Stata
   processx::run(
     stata.path,
