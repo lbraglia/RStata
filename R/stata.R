@@ -1,19 +1,20 @@
 #' Send commands to a Stata process
 #'
 #' Function that sends commands to a Stata process.
-#' @param src character vector of length 1 (path to \code{.do} file) or more
-#' (a set of stata commands). See examples.
+#' @param src character vector of length 1 (path to \code{.do} file) or more (a
+#'   set of stata commands). See examples.
 #' @param data.in \code{\link{data.frame}} to be passed to Stata
-#' @param data.out logical value. If \code{TRUE}, the data at the end of
-#' the Stata command are returned to R.
+#' @param data.out logical value. If \code{TRUE}, the data at the end of the
+#'   Stata command are returned to R.
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
-#' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
+#' @param stata.echo logical value. If \code{TRUE} stata text output will be
+#'   printed
 #' @param ... parameter passed to \code{\link{write.dta}}
 #'
-#' It uses \code{\link[haven]{haven}} (default) or
-#' \code{\link[readstata13]{readstata13}} for Stata version 8 and beyond, and
-#' uses \code{foreign} for Stata version 7 and prior.
+#'   It uses \code{\link[haven]{haven}} (default) or
+#'   \code{\link[readstata13]{readstata13}} for Stata version 8 and beyond, and
+#'   uses \code{foreign} for Stata version 7 and prior.
 #'
 #' @param src character vector of length 1 (path to \code{.do} file) or more (a
 #'   set of stata commands). See examples.
@@ -25,8 +26,14 @@
 #' @param package character string. R package to use to read/write Stata
 #'   datasets for Stata versions 8 and beyond. can either be \code{"haven"} or
 #'   \code{"readstata13"}. defaults to \code{"haven"}.
-#' @param stata.path Stata command to be used
-#' @param stata.version Version of Stata used
+#' @param stata.path Stata command to be used. Can be supplied in the
+#'   environment variable \code{STATA_PATH} or the R option
+#'   \code{RStata.StataPath}. The environmental variable is preferred over the R
+#'   option.
+#' @param stata.version Version of Stata used. Can be supplied in the
+#'   environment variable \code{STATA_VERSION} or the R option
+#'   \code{RStata.StataVersion}. The environmental variable is preferred over
+#'   the R option.
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be
 #'   printed
 #' @param ... parameter passed to \code{\link{write_dta}} or
@@ -69,8 +76,8 @@ stata <- function(
   data.out = FALSE,
   saveold = FALSE,
   package = "haven",
-  stata.path = getOption("RStata.StataPath", Sys.getenv("STATA_PATH")),
-  stata.version = getOption("RStata.StataVersion", Sys.getenv("STATA_VERSION")),
+  stata.path = NULL,
+  stata.version = NULL,
   stata.echo = getOption("RStata.StataEcho", TRUE),
   ...
 ) {
@@ -86,8 +93,15 @@ stata <- function(
   if (!is.logical(data.out))
     stop("data.out must be logical")
   
-  if (is.null(stata.version) | stata.version == "")
+  if (is.null(stata.version) & !is.null(getOption("RStata.StataVersion"))) {
+    stata.version = getOption("RStata.StataVersion")
+  }
+  else if (is.null(stata.version) & !grepl("\\D", Sys.getenv("STATA_VERSION"))) {
+    stata.version = as.integer(Sys.getenv("STATA_VERSION"))
+  }
+  else {
     stop("You need to specify your Stata version")
+  }
   
   if (!is.numeric(stata.version))
     stop("stata.version must be numeric")
@@ -98,8 +112,15 @@ stata <- function(
   if (!package %in% c("haven", "readstata13"))
     stop("package must be either 'haven' or 'readstata13'")
   
-  if (is.null(stata.path) | stata.path == "")
+  if (is.null(stata.path) & !is.null(getOption("RStata.StataPath"))) {
+    stata.path = getOption("RStata.StataPath")
+  }
+  else if (is.null(stata.path) & Sys.getenv("STATA_PATH") != "") {
+    stata.path = Sys.getenv("STATA_PATH")
+  }
+  else {
     stop("You need to set up a Stata path; ?chooseStataBin")
+  }
   
   OS <- Sys.info()["sysname"]
   OS.type <- .Platform$OS.type
