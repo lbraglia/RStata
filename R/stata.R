@@ -258,7 +258,7 @@ stata <- function(
     stdout = "stdout.txt",
     stderr_to_stdout = TRUE
   )
-  stataLog <- readLines("stdout.txt")
+  stataLog <- readLines("stdout.txt", warn = FALSE)
 
   if (stataEcho) {
     if (OS %in% "Windows")
