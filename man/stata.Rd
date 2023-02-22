@@ -10,10 +10,8 @@ stata(
   data.out = FALSE,
   saveold = FALSE,
   package = "haven",
-  stata.path = getOption("RStata.StataPath",
-    stop("You need to set up a Stata path; ?chooseStataBin")),
-  stata.version = getOption("RStata.StataVersion",
-    stop("You need to specify your Stata version")),
+  stata.path = NULL,
+  stata.version = NULL,
   stata.echo = getOption("RStata.StataEcho", TRUE),
   ...
 )
@@ -34,9 +32,15 @@ Stata command are returned to R.}
 datasets for Stata versions 8 and beyond. can either be \code{"haven"} or
 \code{"readstata13"}. defaults to \code{"haven"}.}
 
-\item{stata.path}{Stata command to be used}
+\item{stata.path}{Stata command to be used. Can be supplied in the
+environment variable \code{STATA_PATH} or the R option
+\code{RStata.StataPath}. The environmental variable is preferred over the R
+option.}
 
-\item{stata.version}{Version of Stata used}
+\item{stata.version}{Version of Stata used. Can be supplied in the
+environment variable \code{STATA_VERSION} or the R option
+\code{RStata.StataVersion}. The environmental variable is preferred over
+the R option.}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be
 printed}

@@ -1,6 +1,6 @@
 Package: RStata
 Title: A Bit of Glue Between R and Stata
-Version: 1.3.2
+Version: 1.4.0
 Authors@R: c(
     person("Eve", "Perry", email = "eve@eveperry.com", role = c("aut", "cre")),
     person("Luca", "Braglia", email = "lbraglia@gmail.com", role = "aut"))
@@ -13,8 +13,12 @@ Imports:
     foreign,
     haven,
     readstata13,
-    tools,
-    utils
+    processx,
+    fs,
+    glue
 License: GPL-3
 RoxygenNote: 7.2.0
 Encoding: UTF-8
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
