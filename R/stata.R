@@ -93,14 +93,16 @@ stata <- function(
   if (!is.logical(data.out))
     stop("data.out must be logical")
   
-  if (is.null(stata.version) & !is.null(getOption("RStata.StataVersion"))) {
-    stata.version = getOption("RStata.StataVersion")
-  }
-  else if (is.null(stata.version) & !grepl("\\D", Sys.getenv("STATA_VERSION"))) {
-    stata.version = as.integer(Sys.getenv("STATA_VERSION"))
-  }
-  else {
-    stop("You need to specify your Stata version")
+  if (is.null(stata.version)) {
+    if (!is.null(getOption("RStata.StataVersion"))) {
+      stata.version = getOption("RStata.StataVersion")
+    }
+    else if (!grepl("\\D", Sys.getenv("STATA_VERSION"))) {
+      stata.version = as.integer(Sys.getenv("STATA_VERSION"))
+    }
+    else {
+      stop("You need to specify your Stata version")
+    }
   }
   
   if (!is.numeric(stata.version))
@@ -112,14 +114,16 @@ stata <- function(
   if (!package %in% c("haven", "readstata13"))
     stop("package must be either 'haven' or 'readstata13'")
   
-  if (is.null(stata.path) & !is.null(getOption("RStata.StataPath"))) {
-    stata.path = getOption("RStata.StataPath")
-  }
-  else if (is.null(stata.path) & Sys.getenv("STATA_PATH") != "") {
-    stata.path = Sys.getenv("STATA_PATH")
-  }
-  else {
-    stop("You need to set up a Stata path; ?chooseStataBin")
+  if (is.null(stata.path)) {
+    if (!is.null(getOption("RStata.StataPath"))) {
+      stata.path = getOption("RStata.StataPath")
+    }
+    else if (Sys.getenv("STATA_PATH") != "") {
+      stata.path = Sys.getenv("STATA_PATH")
+    }
+    else {
+      stop("You need to set up a Stata path; ?chooseStataBin")
+    }
   }
   
   OS <- Sys.info()["sysname"]

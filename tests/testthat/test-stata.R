@@ -2,6 +2,20 @@ test_that("string cmd input works", {
   expect_snapshot(stata("sum", mtcars))
 })
 
+test_that("version provided as an argument works", {
+  version = as.numeric(Sys.getenv("STATA_VERSION"))
+  expect_snapshot(
+    stata("sum", mtcars, stata.version = version)
+  )
+})
+
+test_that("path provided as an argument works", {
+  path = Sys.getenv("STATA_PATH")
+  expect_snapshot(
+    stata("sum", mtcars, stata.path = path)
+  )
+})
+
 test_that("string cmd input works with data.out", {
   expect_snapshot(stata("sum", mtcars, data.out = TRUE))
   
