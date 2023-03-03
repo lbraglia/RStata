@@ -8,30 +8,45 @@ stata(
   src = stop("At least 'src' must be specified"),
   data.in = NULL,
   data.out = FALSE,
-  stata.path = getOption("RStata.StataPath",
-    stop("You need to set up a Stata path; ?chooseStataBin")),
-  stata.version = getOption("RStata.StataVersion",
-    stop("You need to specify your Stata version")),
+  saveold = FALSE,
+  package = "haven",
+  stata.path = NULL,
+  stata.version = NULL,
   stata.echo = getOption("RStata.StataEcho", TRUE),
   ...
 )
 }
 \arguments{
-\item{src}{character vector of length 1 (path to \code{.do} file) or more
-(a set of stata commands). See examples.}
+\item{src}{character vector of length 1 (path to \code{.do} file) or more (a
+set of stata commands). See examples.}
 
 \item{data.in}{\code{\link{data.frame}} to be passed to Stata}
 
-\item{data.out}{logical value. If \code{TRUE}, the data at the end of
-the Stata command are returned to R.}
+\item{data.out}{logical value. If \code{TRUE}, the data at the end of the
+Stata command are returned to R.}
 
-\item{stata.path}{Stata command to be used}
+\item{saveold}{logical value.If returning data to R and using Stata version
+13+, use saveold in Stata to save dataset. Defaults to FALSE.}
 
-\item{stata.version}{Version of Stata used}
+\item{package}{character string. R package to use to read/write Stata
+datasets for Stata versions 8 and beyond. can either be \code{"haven"} or
+\code{"readstata13"}. defaults to \code{"haven"}.}
 
-\item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
+\item{stata.path}{Stata command to be used. Can be supplied in the
+environment variable \code{STATA_PATH} or the R option
+\code{RStata.StataPath}. The environmental variable is preferred over the R
+option.}
 
-\item{...}{parameter passed to \code{\link{write.dta}}}
+\item{stata.version}{Version of Stata used. Can be supplied in the
+environment variable \code{STATA_VERSION} or the R option
+\code{RStata.StataVersion}. The environmental variable is preferred over
+the R option.}
+
+\item{stata.echo}{logical value. If \code{TRUE} stata text output will be
+printed}
+
+\item{...}{parameter passed to \code{\link{write_dta}} or
+\code{\link{write.dta}}}
 }
 \description{
 Function that sends commands to a Stata process.
