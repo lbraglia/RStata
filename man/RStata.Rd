@@ -2,9 +2,22 @@
 % Please edit documentation in R/RStata-package.R
 \docType{package}
 \name{RStata}
+\alias{RStata-package}
 \alias{RStata}
 \title{A Bit of Glue Between R and Stata}
 \description{
 A simple R -> Stata interface allowing the user to execute Stata
 commands (both inline and from a .do file) from R.
+}
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/lbraglia/RStata}
+  \item Report bugs at \url{https://github.com/lbraglia/RStata/issues}
+}
+
+}
+\author{
+\strong{Maintainer}: Luca Braglia \email{lbraglia@gmail.com}
+
 }

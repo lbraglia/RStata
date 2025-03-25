@@ -31,7 +31,7 @@ the Stata command are returned to R.}
 
 \item{stata.echo}{logical value. If \code{TRUE} stata text output will be printed}
 
-\item{...}{parameter passed to \code{\link{write.dta}}}
+\item{...}{parameter passed to \code{\link[foreign]{write.dta}}}
 }
 \description{
 Function that sends commands to a Stata process.

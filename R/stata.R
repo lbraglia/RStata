@@ -9,7 +9,7 @@
 #' @param stata.path Stata command to be used
 #' @param stata.version Version of Stata used
 #' @param stata.echo logical value. If \code{TRUE} stata text output will be printed
-#' @param ... parameter passed to \code{\link{write.dta}}
+#' @param ... parameter passed to \code{\link[foreign]{write.dta}}
 #' @examples
 #' \dontrun{
 #' ## Single command
