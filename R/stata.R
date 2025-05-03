@@ -76,6 +76,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     dataOut <- data.out[1L]
     stataVersion <- stata.version[1L]
     stataEcho <- stata.echo[1L]
+    processId <- Sys.getpid()
 
     ## -----------------
     ## OS related config
@@ -84,7 +85,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     ## below) is generated in the current directory
 
     if (OS %in% "Windows") {
-        winRStataLog <- "RStata.log"
+        winRStataLog <- paste0("RStata", processId, ".log")
         on.exit(unlink(winRStataLog))
     }
   
@@ -94,13 +95,13 @@ stata <- function(src = stop("At least 'src' must be specified"),
 
     ## tempfile could be misleading if the do source other dos 
     ## with relative paths
-    doFile <- "RStata.do"
+    doFile <- paste0("RStata", processId, ".do")
     on.exit(unlink(doFile), add = TRUE)
 
     if (dataIn){
         ## dtaInFile <- tempfile("RStataDataIn", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaInFile <- "RStataDataIn.dta"
+        dtaInFile <- paste0("RStataDataIn", processId, ".dta")
         on.exit(unlink(dtaInFile), add = TRUE)
         foreign::write.dta(data.in,
                            file = dtaInFile,
@@ -111,7 +112,7 @@ stata <- function(src = stop("At least 'src' must be specified"),
     if (dataOut) {
         ## dtaOutFile <- tempfile("RStataDataOut", fileext = ".dta")
         ## Windows/Stata8 unhappy?
-        dtaOutFile <- "RStataDataOut.dta"
+        dtaOutFile <- paste0("RStataDataOut", processId, ".dta")
         on.exit(unlink(dtaOutFile), add = TRUE)
     }
 
